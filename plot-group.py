@@ -37,7 +37,7 @@ def plot_latest_solvers(data_dict,piccounter):
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Legende außerhalb des Diagramms platzieren
     picord = "pics-solvers"
     create_folder_if_not_exists(picord)
-    plt.savefig(os.path.join(picord, f'latest_solvers_plot-{piccounter}.png'), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
+    plt.savefig(os.path.join(picord, f'ten_solvers_plot-{piccounter}.png'), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
     print("saved pic")
     plt.clf()
 
