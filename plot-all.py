@@ -31,7 +31,7 @@ def plot_all_solvers(data_dict):
     plt.xticks(rotation=45*2)
     plt.grid(True)
     plt.tight_layout()
-    plt.legend()  # Füge eine Legende hinzu
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Legende außerhalb des Diagramms platzieren
     picord = "pics-solvers"
     create_folder_if_not_exists(picord)
     plt.savefig(os.path.join(picord, 'all_solvers_plot.png'))
@@ -50,7 +50,7 @@ def main():
         if os.path.exists(csv_path):
             with open(csv_path, 'r') as file:
                 csv_reader = csv.DictReader(file, delimiter=',')
-                next(csv_reader)
+                next(csv_reader) 
                 data = list(csv_reader)
                 # Füge die Daten dem entsprechenden Solver im Dictionary hinzu
                 data_dict[folder] = data
@@ -60,4 +60,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
