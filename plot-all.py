@@ -34,7 +34,7 @@ def plot_all_solvers(data_dict):
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Legende außerhalb des Diagramms platzieren
     picord = "pics-solvers"
     create_folder_if_not_exists(picord)
-    plt.savefig(os.path.join(picord, 'all_solvers_plot.png'))
+    plt.savefig(os.path.join(picord, 'all_solvers_plot.png'), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
 
 # Hauptfunktion
 def main():
