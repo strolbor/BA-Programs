@@ -37,6 +37,7 @@ def plot_latest_solvers(data_dict):
     picord = "pics-solvers"
     create_folder_if_not_exists(picord)
     plt.savefig(os.path.join(picord, 'latest_solvers_plot.png'), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
+    print("saved pic")
 
 # Hauptfunktion
 def main():
