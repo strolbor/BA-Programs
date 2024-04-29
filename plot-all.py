@@ -23,6 +23,7 @@ def plot_all_solvers(data_dict):
         # Wende die gleiche Reihenfolge auf die Zeiten an
         times_sorted = [times[versions.index(version)] for version in versions_sorted]
 
+        # Plotte die Daten und benenne den Graphen entsprechend dem Solver
         plt.plot(versions_sorted, times_sorted, marker='o', label=solver)
 
     plt.xlabel('Version')
@@ -35,8 +36,7 @@ def plot_all_solvers(data_dict):
     picord = "pics-solvers"
     create_folder_if_not_exists(picord)
     plt.savefig(os.path.join(picord, 'all_solvers_plot.png'), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
-
-    plt.show()
+    #plt.show()
 
 # Hauptfunktion
 def main():
