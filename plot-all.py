@@ -36,6 +36,8 @@ def plot_all_solvers(data_dict):
     create_folder_if_not_exists(picord)
     plt.savefig(os.path.join(picord, 'all_solvers_plot.png'), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
 
+    plt.show()
+
 # Hauptfunktion
 def main():
     # Suche nach Ordnern, die mit "solve_sat_" beginnen
