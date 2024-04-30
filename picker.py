@@ -143,7 +143,8 @@ def mod_FM():
         i+=1
     
     promt = "Bitte wählen sie den Index für das Modell"
-    tmp = get_valid_input(promt,is_valid_str)
+    tmp = get_valid_input(promt,is_valid_integer)
+    tmp = int(tmp)
 
     if tmp > len(fmlist):
         print("Zu großer Wert.")
@@ -155,12 +156,88 @@ def mod_FM():
     
 
     data_for_feature_model = load_data_for_feature_model_version(feature_model_version)
-    print("FM-Modell:",feature_model_version)
+    
+    file_out = open('FM-sort.csv',"w")
+    tmp = "FM-Modell: " + feature_model_version
+    file_out.write("dimacs-analyzer,dimacs-analyzer-time,statisfiable,"+tmp+"\n")
     for solver,data in data_for_feature_model.items():
-        print("> ",data[0]["dimacs-analyzer"].split("/")[1], data[0]["dimacs-analyzer-time"],"ns", "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable")
-
+        tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + " ns," + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
+        print("> ",tmpSTR)
+        file_out.write(tmpSTR+""+"\n")
+    file_out.close()
+    file_out.close()
     print("\n")
 
+def create_folder_if_not_exists(folder_path):
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+def mod_FM_all():
+    fmlist = [
+        "kconfigreader/linux/v2.5.45[i386].dimacs",
+        "kconfigreader/linux/v2.5.54[i386].dimacs",
+        "kconfigreader/linux/v2.6.1[i386].dimacs",
+        "kconfigreader/linux/v2.6.11[i386].dimacs",
+        "kconfigreader/linux/v2.6.15[i386].dimacs",
+        "kconfigreader/linux/v2.6.20[i386].dimacs",
+        "kconfigreader/linux/v2.6.24[x86].dimacs",
+        "kconfigreader/linux/v2.6.29[x86].dimacs",
+        "kconfigreader/linux/v2.6.33[x86].dimacs",
+        "kconfigreader/linux/v2.6.37[x86].dimacs",
+        "kconfigreader/linux/v3.2[x86].dimacs",
+        "kconfigreader/linux/v3.8[x86].dimacs",
+        "kconfigreader/linux/v3.13[x86].dimacs",
+        "kconfigreader/linux/v3.19[x86].dimacs",
+        "kconfigreader/linux/v4.4[x86].dimacs",
+        "kconfigreader/linux/v4.10[x86].dimacs",
+        "kconfigreader/linux/v4.15[x86].dimacs",
+        "kconfigreader/linux/v5.0[x86].dimacs",
+        "kconfigreader/linux/v5.5[x86].dimacs",
+        "kconfigreader/linux/v5.11[x86].dimacs",
+        "kconfigreader/linux/v5.16[x86].dimacs",
+        "kconfigreader/linux/v6.2[x86].dimacs",
+        "kconfigreader/linux/v6.7[x86].dimacs",
+        "kmax/linux/v2.5.45[i386].dimacs",
+        "kmax/linux/v2.5.54[i386].dimacs",
+        "kmax/linux/v2.6.1[i386].dimacs",
+        "kmax/linux/v2.6.11[i386].dimacs",
+        "kmax/linux/v2.6.15[i386].dimacs",
+        "kmax/linux/v2.6.20[i386].dimacs",
+        "kmax/linux/v2.6.24[x86].dimacs",
+        "kmax/linux/v2.6.29[x86].dimacs",
+        "kmax/linux/v2.6.33[x86].dimacs",
+        "kmax/linux/v2.6.37[x86].dimacs",
+        "kmax/linux/v3.2[x86].dimacs",
+        "kmax/linux/v3.8[x86].dimacs",
+        "kmax/linux/v3.13[x86].dimacs",
+        "kmax/linux/v3.19[x86].dimacs",
+        "kmax/linux/v4.4[x86].dimacs",
+        "kmax/linux/v4.10[x86].dimacs",
+        "kmax/linux/v4.15[x86].dimacs",
+        "kmax/linux/v5.0[x86].dimacs",
+        "kmax/linux/v5.5[x86].dimacs",
+        "kmax/linux/v5.11[x86].dimacs",
+        "kmax/linux/v5.16[x86].dimacs",
+        "kmax/linux/v6.2[x86].dimacs",
+        "kmax/linux/v6.7[x86].dimacs"
+    ]
+
+    for entry in fmlist:
+        feature_model_version = entry
+        data_for_feature_model = load_data_for_feature_model_version(feature_model_version)
+        ordnername = "sorted_by_FM"
+        create_folder_if_not_exists(ordnername)
+    
+        filename = feature_model_version.replace("/","-")
+        file_out = open(os.path.join(ordnername,f'{filename}.csv'),"w")
+        tmp = "FM-Modell: " + feature_model_version
+        file_out.write("dimacs-analyzer,dimacs-analyzer-time,statisfiable,"+tmp+"\n")
+        for solver,data in data_for_feature_model.items():
+            tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + " ns," + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
+            file_out.write(tmpSTR+""+"\n")
+        file_out.close()
+        file_out.close()
+        
 
 
 
@@ -197,6 +274,7 @@ def main():
     print("Willkommen im PArt Picker")
     print("1. Modus: nach FM sortieren")
     print("2. Modus: nach SAT-Solver sortieren")
+    print("3. Batch für FM Sorted")
     print("0. zum Beenden")
 
     prompt = "Bitte geben Sie ein Moduscharakter ein: "
@@ -211,6 +289,8 @@ def main():
         pass
         # SAT sortierung
         mod_SAT()
+    elif user_input == 3:
+        mod_FM_all()
     else:
         print("Bitte was verständliches eingeben.")
         main()
