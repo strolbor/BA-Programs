@@ -37,7 +37,9 @@ def plot_data(folder_path, data):
     create_folder_if_not_exists(picord)
     plt.savefig(os.path.join(picord, f'{folder_path}-plot.png'))
 
-   
+# Filterfunktion definieren
+def filter_entries(entry):
+    return '[i386]' not in entry['dimacs-file']
 
 # Hauptfunktion
 def main():
@@ -51,8 +53,9 @@ def main():
                 csv_reader = csv.DictReader(file, delimiter=',')
                 next(csv_reader) 
                 data = list(csv_reader)
-                #print(data[0])
-                plot_data(folder, data)
+                filtered_data = list(filter(filter_entries, data))
+                print(filtered_data)
+                plot_data(folder, filtered_data)
 
 if __name__ == "__main__":
     main()

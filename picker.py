@@ -167,7 +167,7 @@ def mod_FM():
     tmp = "FM-Modell: " + feature_model_version
     file_out.write("dimacs-analyzer,dimacs-analyzer-time,statisfiable,"+tmp+"\n")
     for solver,data in data_for_feature_model.items():
-        tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + " ns," + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
+        tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
         print("> ",tmpSTR)
         file_out.write(tmpSTR+""+"\n")
     file_out.close()

@@ -42,6 +42,10 @@ def plot_all_solvers(data_dict):
     plt.savefig(os.path.join(picord, 'all_solvers_plot.png'), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
     #plt.show()
 
+# Filterfunktion definieren
+def filter_entries(entry):
+    return '[i386]' not in entry['dimacs-file']
+
 # Hauptfunktion
 def main():
     # Suche nach Ordnern, die mit "solve_sat_" beginnen
@@ -57,8 +61,10 @@ def main():
                 csv_reader = csv.DictReader(file, delimiter=',')
                 next(csv_reader) 
                 data = list(csv_reader)
+                filtered_data = list(filter(filter_entries, data))
+                print(filtered_data)
                 # Füge die Daten dem entsprechenden Solver im Dictionary hinzu
-                data_dict[folder] = data
+                data_dict[folder] = filtered_data
 
     # Plotte die Daten für alle Solver
     plot_all_solvers(data_dict)

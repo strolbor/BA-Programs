@@ -45,7 +45,9 @@ def plot_latest_solvers(data_dict,piccounter):
     print("saved pic")
     plt.clf()
 
-
+# Filterfunktion definieren
+def filter_entries(entry):
+    return '[i386]' not in entry['dimacs-file']
 
 # Hauptfunktion
 def main():
@@ -71,7 +73,7 @@ def main():
 
 
     firstten = folders_sorted[0:10] # Anzahl 10
-    print("1",firstten)
+    # print("1",firstten)
 
     for folder in firstten:
         csv_path = os.path.join(folder, 'output.csv')
@@ -80,9 +82,12 @@ def main():
                 csv_reader = csv.DictReader(file, delimiter=',')
                 next(csv_reader) 
                 data = list(csv_reader)
+                filtered_data = list(filter(filter_entries, data))
+                print(filtered_data)
                 # Füge die Daten dem entsprechenden Solver im Dictionary hinzu
-                data_dict[folder] = data
+                data_dict[folder] = filtered_data
 
+   
     # Plotte die Daten für die neuesten zehn Solver
     plot_latest_solvers(data_dict,'0')
 
@@ -97,8 +102,10 @@ def main():
                 csv_reader = csv.DictReader(file, delimiter=',')
                 next(csv_reader) 
                 data = list(csv_reader)
+                filtered_data = list(filter(filter_entries, data))
+                print(filtered_data)
                 # Füge die Daten dem entsprechenden Solver im Dictionary hinzu
-                data_dict[folder] = data
+                data_dict[folder] = filtered_data
 
     # Plotte die Daten für die neuesten zehn Solver
     plot_latest_solvers(data_dict,'1')
@@ -115,9 +122,12 @@ def main():
                 csv_reader = csv.DictReader(file, delimiter=',')
                 next(csv_reader) 
                 data = list(csv_reader)
+                filtered_data = list(filter(filter_entries, data))
+                print(filtered_data)
                 # Füge die Daten dem entsprechenden Solver im Dictionary hinzu
-                data_dict[folder] = data
+                data_dict[folder] = filtered_data
 
+ 
     # Plotte die Daten für die neuesten zehn Solver
     plot_latest_solvers(data_dict,'2')
 

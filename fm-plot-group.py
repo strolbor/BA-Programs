@@ -2,6 +2,11 @@ import os
 import csv
 import matplotlib.pyplot as plt
 
+# Filterfunktion definieren
+def filter_entries(entry):
+    return '[i386]' not in entry['dimacs-file']
+
+
 def plot_csv_files(folder_path):
     # Überprüfen, ob der angegebene Pfad ein Ordner ist
     if not os.path.isdir(folder_path):
@@ -9,7 +14,9 @@ def plot_csv_files(folder_path):
         return
     
     # Eine Liste für alle CSV-Dateien im Ordner erstellen
-    csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
+    # csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
+    #
+    csv_files = [file for file in os.listdir(folder_path) if file.endswith('[x86].dimacs.csv')]
     
     # Durch jede CSV-Datei iterieren
     for csv_file in csv_files:
@@ -20,7 +27,7 @@ def plot_csv_files(folder_path):
             csv_reader = csv.reader(f)
             next(csv_reader)  # Überspringe die Kopfzeile
             data = [(row[0], int(row[1].split()[0])) for row in csv_reader]  # Nur die ersten beiden Spalten werden berücksichtigt
-        
+            
         # Extrahiere die sortierten Daten in separate Listen
         solver_names, dimacs_analyzer_time = zip(*data)
         
