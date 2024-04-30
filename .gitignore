@@ -2,4 +2,4 @@
 *
 
 # Whitelist specific files or directories
-!plot*
+!*py
