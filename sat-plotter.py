@@ -8,6 +8,10 @@ import sys
 # Es wird der Graph über die benötigte Zeit für alle Feature Modelle mit dem entsprechenden Solver geplottet.
 
 
+# Static Variablen
+ordnerPath = 'sorted_by_SAT'
+
+
 # Ordner erstellen, wenn er nicht existiert
 def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
@@ -46,7 +50,6 @@ def plotter_fkt(data_dict, dateiname,title):
 def all_plotter():
     # Neuer Ordner mit allen Daten ist: sorted_by_SAT
     # csvdaten = [datei for datei in os.listdir('sorted_by_SAT') if datei.endswith('-all.csv')]
-    ordnerPath = 'sorted_by_SAT'
     dateien = os.listdir(ordnerPath)
     csvdaten = [datei for datei in dateien if datei.endswith('-all.csv')]
 
@@ -64,27 +67,9 @@ def all_plotter():
     title = 'Ausführungszeit pro Version für verschiedene Solver'
     plotter_fkt(data_dict, datei,title)
 
-# def separed_plotter():
-#     # Neuer Ordner mit allen Daten ist: sorted_by_SAT
-#     ordnerPath = 'sorted_by_SAT'
-#     dateien = os.listdir(ordnerPath)
-#     csvdaten = [datei for datei in dateien if datei.endswith('-all.csv')]
-
-#     for csvdatei in csvdaten:
-#         path = os.path.join(ordnerPath, csvdatei)
-#         with open(path, 'r') as file:
-#             csv_reader = csv.DictReader(file, delimiter=',')
-#             next(csv_reader)
-#             data = list(csv_reader)
-        
-#         solver = csvdatei.split('-')[0]
-#         dateiname = os.path.join(solver,"-plot.png")
-#         print(dateiname)
-#         plotter_fkt(data, dateiname)
-
+# Für jede Datei wird ein Plot generiert
 def separed_plotter():
     # Neuer Ordner mit allen Daten ist: sorted_by_SAT
-    ordnerPath = 'sorted_by_SAT'
     dateien = os.listdir(ordnerPath)
     csvdaten = [datei for datei in dateien if datei.endswith('-all.csv')]
 
@@ -101,6 +86,38 @@ def separed_plotter():
         datei = os.path.join(ordnerPath,solver)
         plotter_fkt(data_dict, datei,title)
 
+def tenGroup_plotter():
+    # Neuer Ordner mit allen Daten ist: sorted_by_SAT
+    ordnerPath = 'sorted_by_SAT'
+    dateien = os.listdir(ordnerPath)
+    csvdaten = [datei for datei in dateien if datei.endswith('-all.csv')]
+
+    # Sortiere die CSV-Dateien nach dem Jahr
+    csvdaten.sort(key=lambda x: int(x.split('_')[2][:2]))
+
+    # Iteriere über die CSV-Dateien
+    for i in range(0, len(csvdaten), 10):
+        data_dict = {}
+        for csvdatei in csvdaten[i:i+10]:
+            path = os.path.join(ordnerPath, csvdatei)
+            with open(path, 'r') as file:
+                csv_reader = csv.DictReader(file, delimiter=',')
+                next(csv_reader)
+                data_dict[csvdatei] = list(csv_reader)
+        
+        # Erzeuge den Dateinamen und den Titel für das Diagramm
+        start_index = i + 1
+        end_index = min(i + 10, len(csvdaten))
+        solver_range = f"{start_index}-{end_index}"
+        datei = os.path.join(ordnerPath, f"solver_{solver_range}.png")
+        title = f"Solver {solver_range} - Graph"
+        
+        print(datei)
+        # Plotte die Daten für die Gruppe von 10 Solvern
+        plotter_fkt(data_dict, datei, title)
+
+
+
 
 
 if __name__ == "__main__":
@@ -111,6 +128,8 @@ if __name__ == "__main__":
         all_plotter()
     elif int(sys.argv[1]) == 2:
         separed_plotter()
+    elif int(sys.argv[1]) == 3:
+        tenGroup_plotter()
     else:
         print("unbekannter Modus")
     # main()
