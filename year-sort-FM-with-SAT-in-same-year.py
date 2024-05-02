@@ -2,6 +2,11 @@ import os
 import csv
 
 # Dictionary, um die Zuordnung von Linux-Versionen zu Jahren zu speichern
+# SAT Solver  aus Jahr 2005 wird mit dem Feature Modell aus 2005 miteinander Verbunden
+# somit soll die Entwicklung gezeigt werden
+# VGL: SAT-Solver == FM
+
+
 linux_versions = {
     'v2.5.45': '2002',
     'v2.5.54': '2003',
@@ -105,7 +110,7 @@ if __name__ == "__main__":
     #print(yearly_list)
 
     # Ausgabe der Ergebnisse
-    fields = ["Year", "Feature Model", "SAT Solver",'dimacs-analyzer-time','model-satisfiable']
+    fields = ["Year", "FM", "SAT Solver",'dimacs-analyzer-time','model-satisfiable']
 
     # Dateiname der CSV-Datei
     ordnerpath = "verlauf"
@@ -128,9 +133,9 @@ if __name__ == "__main__":
 
         # Schreibe die Daten
         for row in sorted_yearly_list:
-            if 'kmax' in row['FM']:
+            if 'kmax' in row["FM"]:
                 writer1.writerow(row)
-            elif 'kconfigreader' in row['FM']:
+            elif 'kconfigreader' in row["FM"]:
                 writer2.writerow(row)
     file2.close()
     file1.close()

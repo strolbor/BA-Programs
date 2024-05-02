@@ -4,6 +4,8 @@ import sys
 import time
 
 ## Kurzbeschreibung
+
+
 # Dieses Python-Skript extrahiert und sortiert Daten aus CSV-Dateien nach SAT-Solvern und Feature-Modellen. 
 # Es können auch 1 Bulk-Aktion durchgeführt, um alle Daten zu sammeln und zu schreiben.
 

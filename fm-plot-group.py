@@ -2,7 +2,8 @@ import os
 import csv
 import matplotlib.pyplot as plt
 
-
+# Programm plottet SAT-Daten nach dem Feature Modell
+# Oben
 def plot_csv_files(folder_path):
     # Überprüfen, ob der angegebene Pfad ein Ordner ist
     if not os.path.isdir(folder_path):

@@ -2,6 +2,10 @@ import os
 import csv
 import matplotlib.pyplot as plt
 
+
+# Programm erstellt Plots von Daten im "Verlauf" Ordner
+
+
 def plot_csv_files(folder_path):
     if not os.path.isdir(folder_path):
         print("Der angegebene Pfad ist kein Ordner.")
