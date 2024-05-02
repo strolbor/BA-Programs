@@ -180,7 +180,7 @@ def mod_sat_write(matching,dateinameI368,dateinameX86,dateinameALL):
         for item in data:
             towrite = ""+ \
                 item["dimacs-file"] + "," \
-                + str(item["dimacs-file"]).split("/")[2].split(".")[0] + "," \
+                + str(item["dimacs-file"]).split("/")[2].split(".dimacs")[0] + "," \
                 + item["dimacs-analyzer-time"] + ","  \
                 + "satisfiable\n" if bool(item["model-satisfiable"]) == True else "not satisfiable\n"
             if "[i386]" in item["dimacs-file"]:
