@@ -34,6 +34,7 @@ def plot_csv_files(folder_path):
         # Plotten der Daten als Linienplot
         plt.figure(figsize=(12, 6))
         plt.plot(solver_names, dimacs_analyzer_time, marker='o')
+        plt.grid(True)
         plt.xlabel('Solver Name')
         plt.ylabel('dimacs-analyzer-time (ns)')
         tmp = csv_file.split(".dimacs")[0]
