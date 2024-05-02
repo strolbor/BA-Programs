@@ -278,11 +278,6 @@ def mod_SAT_all():
         mod_sat_write(folder,datei1,datei2,datei3)
 
 
-
-
-
-
-
 def main_manuell():
     # Entscheiden was gesucht wird
     print("Willkommen im PArt Picker")
@@ -324,6 +319,9 @@ if __name__ == "__main__":
         elif int(sys.argv[1]) == 3:
             mod_FM_all()
         elif int(sys.argv[1]) == 4:
+            mod_SAT_all()
+        elif int(sys.argv[1]) == 9:
+            mod_FM_all()
             mod_SAT_all()
 
 
