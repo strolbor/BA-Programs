@@ -11,7 +11,6 @@ import sys
 # Static Variablen
 ordnerPath = 'sorted_by_SAT'
 
-
 # Ordner erstellen, wenn er nicht existiert
 def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
@@ -58,7 +57,6 @@ def all_plotter():
         path = os.path.join(ordnerPath, csvdatei)
         with open(path, 'r') as file:
             csv_reader = csv.DictReader(file, delimiter=',')
-            #print(f"Struktur der CSV-Datei {csvdatei}: {csv_reader.fieldnames}")
             next(csv_reader)
             data_dict[csvdatei] = list(csv_reader)
 
@@ -82,8 +80,8 @@ def separed_plotter():
             data_dict[csvdatei] = list(csv_reader)
         
         solver = csvdatei.split('_')[2] + ".png"
-        title = "Solver: " + solver
-        datei = os.path.join(ordnerPath,solver)
+        title = "Solver: " + csvdatei.split('_')[2].split("-all")[0]
+        datei = os.path.join(ordnerPath,f"sat-{solver}")
         plotter_fkt(data_dict, datei,title)
 
 def tenGroup_plotter():
@@ -109,10 +107,9 @@ def tenGroup_plotter():
         start_index = i + 1
         end_index = min(i + 10, len(csvdaten))
         solver_range = f"{start_index}-{end_index}"
-        datei = os.path.join(ordnerPath, f"solver_{solver_range}.png")
+        datei = os.path.join(ordnerPath, f"sat-solver_{solver_range}.png")
         title = f"Solver {solver_range} - Graph"
         
-        print(datei)
         # Plotte die Daten für die Gruppe von 10 Solvern
         plotter_fkt(data_dict, datei, title)
 
@@ -123,12 +120,20 @@ def tenGroup_plotter():
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print(f"Usage: python3 {sys.argv[0]} <Modus>")
+        print("1. Alle Graphen werden in 1 Diagramm geplottet.")
+        print("2. Für jeden Datei wird eine Graphen Datei gemacht.")
+        print("3. Fasse jeweils 10 Graphen zu einer Datei zusammen.")
+        print("9. Führ alles als Batch aus")
         exit()
     if int(sys.argv[1]) == 1:
         all_plotter()
     elif int(sys.argv[1]) == 2:
         separed_plotter()
     elif int(sys.argv[1]) == 3:
+        tenGroup_plotter()
+    elif int(sys.argv[1]) == 9:
+        all_plotter()
+        separed_plotter()
         tenGroup_plotter()
     else:
         print("unbekannter Modus")

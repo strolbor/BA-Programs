@@ -2,10 +2,6 @@ import os
 import csv
 import matplotlib.pyplot as plt
 
-# Filterfunktion definieren
-def filter_entries(entry):
-    return '[i386]' not in entry['dimacs-file']
-
 
 def plot_csv_files(folder_path):
     # Überprüfen, ob der angegebene Pfad ein Ordner ist
@@ -14,9 +10,9 @@ def plot_csv_files(folder_path):
         return
     
     # Eine Liste für alle CSV-Dateien im Ordner erstellen
-    # csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
+    csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
     #
-    csv_files = [file for file in os.listdir(folder_path) if file.endswith('[x86].dimacs.csv')]
+    #csv_files = [file for file in os.listdir(folder_path) if file.endswith('[x86].dimacs.csv')]
     
     # Durch jede CSV-Datei iterieren
     for csv_file in csv_files:
@@ -40,7 +36,8 @@ def plot_csv_files(folder_path):
         plt.plot(solver_names, dimacs_analyzer_time, marker='o')
         plt.xlabel('Solver Name')
         plt.ylabel('dimacs-analyzer-time (ns)')
-        plt.title(f'Plot für {csv_file}')
+        tmp = csv_file.split(".dimacs")[0]
+        plt.title(f'Plot für {tmp}')
         plt.xticks(rotation=90)
         plt.tight_layout()
         

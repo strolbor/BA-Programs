@@ -1,6 +1,6 @@
 import os
 import csv
-
+import sys
 
 ## Kurzbeschreibung
 # Dieses Python-Skript extrahiert und sortiert Daten aus CSV-Dateien nach SAT-Solvern und Feature-Modellen. 
@@ -144,10 +144,11 @@ def find_matching_entry(array, prefix):
 
 def printerFM(dateiname,feature_model_version,data_for_feature_model):
     file_out = open(dateiname,"w")
-    tmp = "FM-Modell: " + feature_model_version
-    file_out.write("dimacs-analyzer,dimacs-analyzer-time,statisfiable,"+tmp+"\n")
+    file_out.write("dimacs-analyzer,dimacs-analyzer-time,model,statisfiable\n")
+    # FM-Modell: kconfigreader/linux/v2.6.20[i386].dimacs
+    model = feature_model_version.split("/")[2].split(".dimacs")[0]
     for solver,data in data_for_feature_model.items():
-        tmpSTR = "{},{},{}".format(data[0]["dimacs-analyzer"].split("/")[1],data[0]["dimacs-analyzer-time"],"satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable")
+        tmpSTR = "{},{},{},{}".format(data[0]["dimacs-analyzer"].split("/")[1],data[0]["dimacs-analyzer-time"], model,"satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable")
         #tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
         print("> ",tmpSTR)
         file_out.write(tmpSTR+""+"\n")
@@ -282,13 +283,13 @@ def mod_SAT_all():
 
 
 
-def main():
+def main_manuell():
     # Entscheiden was gesucht wird
     print("Willkommen im PArt Picker")
     print("1. Modus: nach FM sortieren")
     print("2. Modus: nach SAT-Solver sortieren")
     print("3. Batch für FM Sorted")
-    print("4. BAtch für SAT Sorted")
+    print("4. Batch für SAT Sorted")
     print("0. zum Beenden")
 
     prompt = "Bitte geben Sie ein Moduscharakter ein: "
@@ -307,12 +308,24 @@ def main():
         mod_SAT_all()
     else:
         print("Bitte was verständliches eingeben.")
-        main()
+        main_manuell()
 
         
 # Beispielaufrufe der Funktionen
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        main_manuell()
+    else:
+        if int(sys.argv[1]) == 1:
+            mod_FM()
+        elif int(sys.argv[1]) == 2:
+            # SAT sortierung
+            mod_SAT()
+        elif int(sys.argv[1]) == 3:
+            mod_FM_all()
+        elif int(sys.argv[1]) == 4:
+            mod_SAT_all()
+
 
        
 
