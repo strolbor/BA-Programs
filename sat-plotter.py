@@ -3,6 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 import re
 import sys
+import time
 
 # Kurzbeschreibung
 # Es wird der Graph über die benötigte Zeit für alle Feature Modelle mit dem entsprechenden Solver geplottet.
@@ -44,13 +45,15 @@ def plotter_fkt(data_dict, dateiname,title):
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Legende außerhalb des Diagramms platzieren
     plt.savefig(os.path.join(f"{dateiname}"), bbox_inches='tight')  # bbox_inches='tight' hinzugefügt
     # plt.show()
+    plt.close()
+
 
 # Hauptfunktion
-def all_plotter():
+def all_plotter(filter : str):
     # Neuer Ordner mit allen Daten ist: sorted_by_SAT
     # csvdaten = [datei for datei in os.listdir('sorted_by_SAT') if datei.endswith('-all.csv')]
     dateien = os.listdir(ordnerPath)
-    csvdaten = [datei for datei in dateien if datei.endswith('-all.csv')]
+    csvdaten = [datei for datei in dateien if datei.endswith(filter)]
 
     data_dict = {}
     for csvdatei in csvdaten:
@@ -61,15 +64,15 @@ def all_plotter():
             data_dict[csvdatei] = list(csv_reader)
 
     # Plotte die Daten für alle Solver
-    datei = os.path.join(ordnerPath,"sat-all-plot.png")
-    title = 'Ausführungszeit pro Version für verschiedene Solver'
+    datei = os.path.join(ordnerPath,f"sat-all-{filter}-plot.png")
+    title = f'Ausführungszeit pro Version für verschiedene Solver ({filter})'
     plotter_fkt(data_dict, datei,title)
 
 # Für jede Datei wird ein Plot generiert
-def separed_plotter():
+def separed_plotter(filter : str):
     # Neuer Ordner mit allen Daten ist: sorted_by_SAT
     dateien = os.listdir(ordnerPath)
-    csvdaten = [datei for datei in dateien if datei.endswith('-all.csv')]
+    csvdaten = [datei for datei in dateien if datei.endswith(filter)]
 
     for csvdatei in csvdaten:
         path = os.path.join(ordnerPath, csvdatei)
@@ -80,15 +83,15 @@ def separed_plotter():
             data_dict[csvdatei] = list(csv_reader)
         
         solver = csvdatei.split('_')[2] + ".png"
-        title = "Solver: " + csvdatei.split('_')[2].split("-all")[0]
-        datei = os.path.join(ordnerPath,f"sat-{solver}")
+        title = "Solver: " + csvdatei.split('_')[2].split("-all")[0] + f" ({filter})"
+        datei = os.path.join(ordnerPath,f"sat-{solver}-{filter}.png")
         plotter_fkt(data_dict, datei,title)
 
-def tenGroup_plotter():
+def tenGroup_plotter(filter :str):
     # Neuer Ordner mit allen Daten ist: sorted_by_SAT
     ordnerPath = 'sorted_by_SAT'
     dateien = os.listdir(ordnerPath)
-    csvdaten = [datei for datei in dateien if datei.endswith('-all.csv')]
+    csvdaten = [datei for datei in dateien if datei.endswith(filter)]
 
     # Sortiere die CSV-Dateien nach dem Jahr
     csvdaten.sort(key=lambda x: int(x.split('_')[2][:2]))
@@ -107,8 +110,8 @@ def tenGroup_plotter():
         start_index = i + 1
         end_index = min(i + 10, len(csvdaten))
         solver_range = f"{start_index}-{end_index}"
-        datei = os.path.join(ordnerPath, f"sat-solver_{solver_range}.png")
-        title = f"Solver {solver_range} - Graph"
+        datei = os.path.join(ordnerPath, f"sat-solver_{solver_range}-{filter}.png")
+        title = f"Solver {solver_range} - Graph ({filter})"
         
         # Plotte die Daten für die Gruppe von 10 Solvern
         plotter_fkt(data_dict, datei, title)
@@ -116,8 +119,13 @@ def tenGroup_plotter():
 
 
 
+# Verfügbare Filter
+FILTER_KCONFIG = "-kconfig.csv"
+FILTER_KMAX = "-kmax.csv"
+FILTER_ALL = "all.sh"
 
 if __name__ == "__main__":
+    start_time = time.time()
     if len(sys.argv) != 2:
         print(f"Usage: python3 {sys.argv[0]} <Modus>")
         print("1. Alle Graphen werden in 1 Diagramm geplottet.")
@@ -126,15 +134,26 @@ if __name__ == "__main__":
         print("9. Führ alles als Batch aus")
         exit()
     if int(sys.argv[1]) == 1:
-        all_plotter()
+        all_plotter(FILTER_KCONFIG)
+        all_plotter(FILTER_KMAX)
     elif int(sys.argv[1]) == 2:
-        separed_plotter()
+        separed_plotter(FILTER_KCONFIG)
+        separed_plotter(FILTER_KMAX)
     elif int(sys.argv[1]) == 3:
-        tenGroup_plotter()
+        tenGroup_plotter(FILTER_KCONFIG)
+        tenGroup_plotter(FILTER_KMAX)
+
     elif int(sys.argv[1]) == 9:
-        all_plotter()
-        separed_plotter()
-        tenGroup_plotter()
+        all_plotter(FILTER_KCONFIG)
+        separed_plotter(FILTER_KCONFIG)
+        tenGroup_plotter(FILTER_KCONFIG)
+
+        all_plotter(FILTER_KMAX)
+        separed_plotter(FILTER_KMAX)
+        tenGroup_plotter(FILTER_KMAX)
     else:
         print("unbekannter Modus")
     # main()
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print("Ausführungszeit:", execution_time, "Sekunden")

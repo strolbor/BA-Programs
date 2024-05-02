@@ -1,6 +1,7 @@
 import os
 import csv
 import sys
+import time
 
 ## Kurzbeschreibung
 # Dieses Python-Skript extrahiert und sortiert Daten aus CSV-Dateien nach SAT-Solvern und Feature-Modellen. 
@@ -104,8 +105,6 @@ def load_data_for_solver(solver_name):
                 csv_reader = csv.DictReader(file, delimiter=',')
                 data = list(csv_reader)
                 data_dict[folder] = data
-    
-    #print(data_dict)
 
     # Filtern der Daten für den angegebenen SAT-Solver
     filtered_data = {}
@@ -113,8 +112,6 @@ def load_data_for_solver(solver_name):
         if str(solver).endswith(solver_name):
             filtered_data[solver_name] =data # data
         
-
-    #print("FD",filtered_data)
     return filtered_data
 
 def get_valid_input(prompt, validation_func):
@@ -150,7 +147,6 @@ def printerFM(dateiname,feature_model_version,data_for_feature_model):
     for solver,data in data_for_feature_model.items():
         tmpSTR = "{},{},{},{}".format(data[0]["dimacs-analyzer"].split("/")[1],data[0]["dimacs-analyzer-time"], model,"satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable")
         #tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
-        print("> ",tmpSTR)
         file_out.write(tmpSTR+""+"\n")
     file_out.flush()
     file_out.close()
@@ -163,15 +159,14 @@ def create_folder_if_not_exists(folder_path):
 
 
 """Diese Funktion sucht und schreibt die Sachen für mod_SAT"""
-def mod_sat_write(matching,dateinameI368,dateinameX86,dateinameALL):    
-    solver_name =matching #= "02-zchaff"
+def mod_sat_write(matching,dateinameKmax,dateinameKconfig,dateinameALL):    
+    solver_name = matching #= "02-zchaff"
     data_for_solver = load_data_for_solver(solver_name)
-    #print("Sat-Solver:",solver_name)
 
-    file = open(dateinameI368,"w")
-    file2 = open(dateinameX86,"w")
+    file = open(dateinameKmax,"w")
+    file2 = open(dateinameKconfig,"w")
     file3 = open(dateinameALL,"w")
-    toWrite0 = "dimacs-analyzer,version,dimacs-analyzer-time,statisfiable,"+solver_name+"\n"
+    toWrite0 = "dimacs-analyzer,model-version,dimacs-analyzer-time,statisfiable,"+solver_name+"\n"
     file.write(toWrite0)
     file2.write(toWrite0)
     file3.write(toWrite0)
@@ -182,10 +177,11 @@ def mod_sat_write(matching,dateinameI368,dateinameX86,dateinameALL):
                 item["dimacs-file"] + "," \
                 + str(item["dimacs-file"]).split("/")[2].split(".dimacs")[0] + "," \
                 + item["dimacs-analyzer-time"] + ","  \
-                + "satisfiable\n" if bool(item["model-satisfiable"]) == True else "not satisfiable\n"
-            if "[i386]" in item["dimacs-file"]:
+                + "satisfiable\n" if bool(item["model-satisfiable"]) == True else "not satisfiable\n" \
+                + solver_name
+            if "kmax" in item["dimacs-file"]:
                 file.write(towrite) 
-            elif "[x86]" in item["dimacs-file"]:
+            elif "kconfig" in item["dimacs-file"]:
                 file2.write(towrite)
             else:
                 print("unknow typ: "+item["dimacs-file"]) 
@@ -261,8 +257,8 @@ def mod_SAT():
     matching = find_matching_entry(folders,find_user_input)
 
     print("\n")
-    datei1 = os.path.join(ordnername,f"{matching}-i386.csv") # Datei für i386
-    datei2 = os.path.join(ordnername,f"{matching}-x86.csv") # Datei für x86
+    datei1 = os.path.join(ordnername,f"{matching}-kmax.csv") # Datei für kmax
+    datei2 = os.path.join(ordnername,f"{matching}-kconfig.csv") # Datei für kconfig
     datei3 = os.path.join(ordnername,f"{matching}-all.csv") # Datei für alles
     mod_sat_write(matching,datei1,datei2,datei3)
 
@@ -272,8 +268,8 @@ def mod_SAT_all():
     # Sat Solvern suchen
     folders = get_folders()
     for folder in folders:
-        datei1 = os.path.join(ordnername,f"{folder}-i386.csv") # Datei für i386
-        datei2 = os.path.join(ordnername,f"{folder}-x86.csv") # Datei für x86
+        datei1 = os.path.join(ordnername,f"{folder}-kmax.csv") # Datei für kmax
+        datei2 = os.path.join(ordnername,f"{folder}-kconfig.csv") # Datei für kconfig
         datei3 = os.path.join(ordnername,f"{folder}-all.csv") # Datei für alles
         mod_sat_write(folder,datei1,datei2,datei3)
 
@@ -311,6 +307,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         main_manuell()
     else:
+        start_time = time.time()
         if int(sys.argv[1]) == 1:
             mod_FM()
         elif int(sys.argv[1]) == 2:
@@ -323,6 +320,10 @@ if __name__ == "__main__":
         elif int(sys.argv[1]) == 9:
             mod_FM_all()
             mod_SAT_all()
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print("Ausführungszeit:", execution_time, "Sekunden")
+
 
 
        
