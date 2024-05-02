@@ -6,6 +6,55 @@ import csv
 # Dieses Python-Skript extrahiert und sortiert Daten aus CSV-Dateien nach SAT-Solvern und Feature-Modellen. 
 # Es können auch 1 Bulk-Aktion durchgeführt, um alle Daten zu sammeln und zu schreiben.
 
+fmlist = [
+        "kconfigreader/linux/v2.5.45[i386].dimacs",
+        "kconfigreader/linux/v2.5.54[i386].dimacs",
+        "kconfigreader/linux/v2.6.1[i386].dimacs",
+        "kconfigreader/linux/v2.6.11[i386].dimacs",
+        "kconfigreader/linux/v2.6.15[i386].dimacs",
+        "kconfigreader/linux/v2.6.20[i386].dimacs",
+        "kconfigreader/linux/v2.6.24[x86].dimacs",
+        "kconfigreader/linux/v2.6.29[x86].dimacs",
+        "kconfigreader/linux/v2.6.33[x86].dimacs",
+        "kconfigreader/linux/v2.6.37[x86].dimacs",
+        "kconfigreader/linux/v3.2[x86].dimacs",
+        "kconfigreader/linux/v3.8[x86].dimacs",
+        "kconfigreader/linux/v3.13[x86].dimacs",
+        "kconfigreader/linux/v3.19[x86].dimacs",
+        "kconfigreader/linux/v4.4[x86].dimacs",
+        "kconfigreader/linux/v4.10[x86].dimacs",
+        "kconfigreader/linux/v4.15[x86].dimacs",
+        "kconfigreader/linux/v5.0[x86].dimacs",
+        "kconfigreader/linux/v5.5[x86].dimacs",
+        "kconfigreader/linux/v5.11[x86].dimacs",
+        "kconfigreader/linux/v5.16[x86].dimacs",
+        "kconfigreader/linux/v6.2[x86].dimacs",
+        "kconfigreader/linux/v6.7[x86].dimacs",
+        "kmax/linux/v2.5.45[i386].dimacs",
+        "kmax/linux/v2.5.54[i386].dimacs",
+        "kmax/linux/v2.6.1[i386].dimacs",
+        "kmax/linux/v2.6.11[i386].dimacs",
+        "kmax/linux/v2.6.15[i386].dimacs",
+        "kmax/linux/v2.6.20[i386].dimacs",
+        "kmax/linux/v2.6.24[x86].dimacs",
+        "kmax/linux/v2.6.29[x86].dimacs",
+        "kmax/linux/v2.6.33[x86].dimacs",
+        "kmax/linux/v2.6.37[x86].dimacs",
+        "kmax/linux/v3.2[x86].dimacs",
+        "kmax/linux/v3.8[x86].dimacs",
+        "kmax/linux/v3.13[x86].dimacs",
+        "kmax/linux/v3.19[x86].dimacs",
+        "kmax/linux/v4.4[x86].dimacs",
+        "kmax/linux/v4.10[x86].dimacs",
+        "kmax/linux/v4.15[x86].dimacs",
+        "kmax/linux/v5.0[x86].dimacs",
+        "kmax/linux/v5.5[x86].dimacs",
+        "kmax/linux/v5.11[x86].dimacs",
+        "kmax/linux/v5.16[x86].dimacs",
+        "kmax/linux/v6.2[x86].dimacs",
+        "kmax/linux/v6.7[x86].dimacs"
+    ]
+
 
 # Funktion um Ordner zu holen
 def get_folders():
@@ -93,55 +142,63 @@ def find_matching_entry(array, prefix):
             return entry
     return None
 
+def printerFM(dateiname,feature_model_version,data_for_feature_model):
+    file_out = open(dateiname,"w")
+    tmp = "FM-Modell: " + feature_model_version
+    file_out.write("dimacs-analyzer,dimacs-analyzer-time,statisfiable,"+tmp+"\n")
+    for solver,data in data_for_feature_model.items():
+        tmpSTR = "{},{},{}".format(data[0]["dimacs-analyzer"].split("/")[1],data[0]["dimacs-analyzer-time"],"satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable")
+        #tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
+        print("> ",tmpSTR)
+        file_out.write(tmpSTR+""+"\n")
+    file_out.flush()
+    file_out.close()
+
+
+
+def create_folder_if_not_exists(folder_path):
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+
+"""Diese Funktion sucht und schreibt die Sachen für mod_SAT"""
+def mod_sat_write(matching,dateinameI368,dateinameX86,dateinameALL):    
+    solver_name =matching #= "02-zchaff"
+    data_for_solver = load_data_for_solver(solver_name)
+    #print("Sat-Solver:",solver_name)
+
+    file = open(dateinameI368,"w")
+    file2 = open(dateinameX86,"w")
+    file3 = open(dateinameALL,"w")
+    toWrite0 = "dimacs-analyzer,version,dimacs-analyzer-time,statisfiable,"+solver_name+"\n"
+    file.write(toWrite0)
+    file2.write(toWrite0)
+    file3.write(toWrite0)
+
+    for solver,data in data_for_solver.items():
+        for item in data:
+            towrite = ""+ \
+                item["dimacs-file"] + "," \
+                + str(item["dimacs-file"]).split("/")[2].split(".")[0] + "," \
+                + item["dimacs-analyzer-time"] + ","  \
+                + "satisfiable\n" if bool(item["model-satisfiable"]) == True else "not satisfiable\n"
+            if "[i386]" in item["dimacs-file"]:
+                file.write(towrite) 
+            elif "[x86]" in item["dimacs-file"]:
+                file2.write(towrite)
+            else:
+                print("unknow typ: "+item["dimacs-file"]) 
+            file3.write(towrite)
+    file.flush()
+    file.close()
+    file2.flush()
+    file2.close()
+    file3.flush()
+    file3.close()
+
+# HAupt Funktionen des Programmes
+
 def mod_FM():
-    fmlist = [
-        "kconfigreader/linux/v2.5.45[i386].dimacs",
-        "kconfigreader/linux/v2.5.54[i386].dimacs",
-        "kconfigreader/linux/v2.6.1[i386].dimacs",
-        "kconfigreader/linux/v2.6.11[i386].dimacs",
-        "kconfigreader/linux/v2.6.15[i386].dimacs",
-        "kconfigreader/linux/v2.6.20[i386].dimacs",
-        "kconfigreader/linux/v2.6.24[x86].dimacs",
-        "kconfigreader/linux/v2.6.29[x86].dimacs",
-        "kconfigreader/linux/v2.6.33[x86].dimacs",
-        "kconfigreader/linux/v2.6.37[x86].dimacs",
-        "kconfigreader/linux/v3.2[x86].dimacs",
-        "kconfigreader/linux/v3.8[x86].dimacs",
-        "kconfigreader/linux/v3.13[x86].dimacs",
-        "kconfigreader/linux/v3.19[x86].dimacs",
-        "kconfigreader/linux/v4.4[x86].dimacs",
-        "kconfigreader/linux/v4.10[x86].dimacs",
-        "kconfigreader/linux/v4.15[x86].dimacs",
-        "kconfigreader/linux/v5.0[x86].dimacs",
-        "kconfigreader/linux/v5.5[x86].dimacs",
-        "kconfigreader/linux/v5.11[x86].dimacs",
-        "kconfigreader/linux/v5.16[x86].dimacs",
-        "kconfigreader/linux/v6.2[x86].dimacs",
-        "kconfigreader/linux/v6.7[x86].dimacs",
-        "kmax/linux/v2.5.45[i386].dimacs",
-        "kmax/linux/v2.5.54[i386].dimacs",
-        "kmax/linux/v2.6.1[i386].dimacs",
-        "kmax/linux/v2.6.11[i386].dimacs",
-        "kmax/linux/v2.6.15[i386].dimacs",
-        "kmax/linux/v2.6.20[i386].dimacs",
-        "kmax/linux/v2.6.24[x86].dimacs",
-        "kmax/linux/v2.6.29[x86].dimacs",
-        "kmax/linux/v2.6.33[x86].dimacs",
-        "kmax/linux/v2.6.37[x86].dimacs",
-        "kmax/linux/v3.2[x86].dimacs",
-        "kmax/linux/v3.8[x86].dimacs",
-        "kmax/linux/v3.13[x86].dimacs",
-        "kmax/linux/v3.19[x86].dimacs",
-        "kmax/linux/v4.4[x86].dimacs",
-        "kmax/linux/v4.10[x86].dimacs",
-        "kmax/linux/v4.15[x86].dimacs",
-        "kmax/linux/v5.0[x86].dimacs",
-        "kmax/linux/v5.5[x86].dimacs",
-        "kmax/linux/v5.11[x86].dimacs",
-        "kmax/linux/v5.16[x86].dimacs",
-        "kmax/linux/v6.2[x86].dimacs",
-        "kmax/linux/v6.7[x86].dimacs"
-    ]
     i = 0
     print("Verfügbare FM Models")
     for entry in fmlist:
@@ -162,115 +219,65 @@ def mod_FM():
     
 
     data_for_feature_model = load_data_for_feature_model_version(feature_model_version)
-    
-    file_out = open('FM-sort.csv',"w")
-    tmp = "FM-Modell: " + feature_model_version
-    file_out.write("dimacs-analyzer,dimacs-analyzer-time,statisfiable,"+tmp+"\n")
-    for solver,data in data_for_feature_model.items():
-        tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
-        print("> ",tmpSTR)
-        file_out.write(tmpSTR+""+"\n")
-    file_out.close()
-    file_out.close()
+    printerFM('FM-sort.csv',feature_model_version,data_for_feature_model)
+
     print("\n")
 
-def create_folder_if_not_exists(folder_path):
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+
+
 
 def mod_FM_all():
-    fmlist = [
-        "kconfigreader/linux/v2.5.45[i386].dimacs",
-        "kconfigreader/linux/v2.5.54[i386].dimacs",
-        "kconfigreader/linux/v2.6.1[i386].dimacs",
-        "kconfigreader/linux/v2.6.11[i386].dimacs",
-        "kconfigreader/linux/v2.6.15[i386].dimacs",
-        "kconfigreader/linux/v2.6.20[i386].dimacs",
-        "kconfigreader/linux/v2.6.24[x86].dimacs",
-        "kconfigreader/linux/v2.6.29[x86].dimacs",
-        "kconfigreader/linux/v2.6.33[x86].dimacs",
-        "kconfigreader/linux/v2.6.37[x86].dimacs",
-        "kconfigreader/linux/v3.2[x86].dimacs",
-        "kconfigreader/linux/v3.8[x86].dimacs",
-        "kconfigreader/linux/v3.13[x86].dimacs",
-        "kconfigreader/linux/v3.19[x86].dimacs",
-        "kconfigreader/linux/v4.4[x86].dimacs",
-        "kconfigreader/linux/v4.10[x86].dimacs",
-        "kconfigreader/linux/v4.15[x86].dimacs",
-        "kconfigreader/linux/v5.0[x86].dimacs",
-        "kconfigreader/linux/v5.5[x86].dimacs",
-        "kconfigreader/linux/v5.11[x86].dimacs",
-        "kconfigreader/linux/v5.16[x86].dimacs",
-        "kconfigreader/linux/v6.2[x86].dimacs",
-        "kconfigreader/linux/v6.7[x86].dimacs",
-        "kmax/linux/v2.5.45[i386].dimacs",
-        "kmax/linux/v2.5.54[i386].dimacs",
-        "kmax/linux/v2.6.1[i386].dimacs",
-        "kmax/linux/v2.6.11[i386].dimacs",
-        "kmax/linux/v2.6.15[i386].dimacs",
-        "kmax/linux/v2.6.20[i386].dimacs",
-        "kmax/linux/v2.6.24[x86].dimacs",
-        "kmax/linux/v2.6.29[x86].dimacs",
-        "kmax/linux/v2.6.33[x86].dimacs",
-        "kmax/linux/v2.6.37[x86].dimacs",
-        "kmax/linux/v3.2[x86].dimacs",
-        "kmax/linux/v3.8[x86].dimacs",
-        "kmax/linux/v3.13[x86].dimacs",
-        "kmax/linux/v3.19[x86].dimacs",
-        "kmax/linux/v4.4[x86].dimacs",
-        "kmax/linux/v4.10[x86].dimacs",
-        "kmax/linux/v4.15[x86].dimacs",
-        "kmax/linux/v5.0[x86].dimacs",
-        "kmax/linux/v5.5[x86].dimacs",
-        "kmax/linux/v5.11[x86].dimacs",
-        "kmax/linux/v5.16[x86].dimacs",
-        "kmax/linux/v6.2[x86].dimacs",
-        "kmax/linux/v6.7[x86].dimacs"
-    ]
+    ordnername = "sorted_by_FM"
+    create_folder_if_not_exists(ordnername)
 
     for entry in fmlist:
         feature_model_version = entry
         data_for_feature_model = load_data_for_feature_model_version(feature_model_version)
-        ordnername = "sorted_by_FM"
-        create_folder_if_not_exists(ordnername)
-    
+
         filename = feature_model_version.replace("/","-")
-        file_out = open(os.path.join(ordnername,f'{filename}.csv'),"w")
-        tmp = "FM-Modell: " + feature_model_version
-        file_out.write("dimacs-analyzer,dimacs-analyzer-time,statisfiable,"+tmp+"\n")
-        for solver,data in data_for_feature_model.items():
-            tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + " ns," + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
-            file_out.write(tmpSTR+""+"\n")
-        file_out.close()
-        file_out.close()
+        dateiname = os.path.join(ordnername,f'{filename}.csv')
+
+        printerFM(dateiname,feature_model_version,data_for_feature_model)
         
 
-
-
 def mod_SAT():
+    ordnername = "sorted_by_SAT"
+    create_folder_if_not_exists(ordnername)
+
+    # Sat Solvern suchen
     folders = get_folders()
     print("Verfügbare Sat-Solvern")
     for item in folders:
         print(item.split('_')[2],end=',')
     print("\n")
+
+    # Eingabe vom User erwarten
     promt = "Bitte geben sie den Anfang der Eintrags an (also die zweistellige Jahr)"
     tmp = get_valid_input(promt,is_valid_str)
     find_user_input = "solve_sat-competition_" + tmp
 
+    # MAtching finden
     matching = find_matching_entry(folders,find_user_input)
 
-    print("matchiung",matching)    
-
     print("\n")
-    print("\n")
-    solver_name =matching #= "02-zchaff"
-    data_for_solver = load_data_for_solver(solver_name)
-    print("Sat-Solver:",solver_name)
+    datei1 = os.path.join(ordnername,f"{matching}-i386.csv") # Datei für i386
+    datei2 = os.path.join(ordnername,f"{matching}-x86.csv") # Datei für x86
+    datei3 = os.path.join(ordnername,f"{matching}-all.csv") # Datei für alles
+    mod_sat_write(matching,datei1,datei2,datei3)
 
-    for solver,data in data_for_solver.items():
-        for item in data:
-            print("> ",item["dimacs-file"],item["dimacs-analyzer-time"],"ns","satisfiable" if bool(item["model-satisfiable"]) == True else "not satisfiable")
- 
+def mod_SAT_all():
+    ordnername = "sorted_by_SAT"
+    create_folder_if_not_exists(ordnername)
+    # Sat Solvern suchen
+    folders = get_folders()
+    for folder in folders:
+        datei1 = os.path.join(ordnername,f"{folder}-i386.csv") # Datei für i386
+        datei2 = os.path.join(ordnername,f"{folder}-x86.csv") # Datei für x86
+        datei3 = os.path.join(ordnername,f"{folder}-all.csv") # Datei für alles
+        mod_sat_write(folder,datei1,datei2,datei3)
+
+
+
 
 
 
@@ -281,6 +288,7 @@ def main():
     print("1. Modus: nach FM sortieren")
     print("2. Modus: nach SAT-Solver sortieren")
     print("3. Batch für FM Sorted")
+    print("4. BAtch für SAT Sorted")
     print("0. zum Beenden")
 
     prompt = "Bitte geben Sie ein Moduscharakter ein: "
@@ -288,15 +296,15 @@ def main():
     if int(user_input) == 0:
         exit()
     elif user_input == 1:
-        pass
         # FM soprtierung
         mod_FM()
     elif user_input == 2:
-        pass
         # SAT sortierung
         mod_SAT()
     elif user_input == 3:
         mod_FM_all()
+    elif user_input == 4:
+        mod_SAT_all()
     else:
         print("Bitte was verständliches eingeben.")
         main()
