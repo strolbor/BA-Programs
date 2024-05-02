@@ -32,7 +32,7 @@ def plot_csv_files(folder_path):
         plt.grid(True)
         plt.xlabel('Year')
         plt.ylabel('dimacs-analyzer-time (ns)')
-        plt.title('dimacs-analyzer-time über die Jahre - {}'.format(csv_file.split(".dimacs")[0]))
+        plt.title('Vergleich Jahr x SAT Solver mit FM Jahr x - {}'.format(csv_file.split(".dimacs")[0]))
         plt.xticks(years)  # Alle Jahre anzeigen
         plt.tight_layout()
         
@@ -42,5 +42,5 @@ def plot_csv_files(folder_path):
         plt.close()
 
 # Beispielaufruf des Programms mit dem Ordnerpfad
-folder_path = "verlauf"
+folder_path =  "sorted_verlauf"
 plot_csv_files(folder_path)

@@ -113,7 +113,7 @@ if __name__ == "__main__":
     fields = ["Year", "FM", "SAT Solver",'dimacs-analyzer-time','model-satisfiable']
 
     # Dateiname der CSV-Datei
-    ordnerpath = "verlauf"
+    ordnerpath = "sorted_verlauf"
     create_folder_if_not_exists(ordnerpath)
     csv_file1 = os.path.join(ordnerpath,"Version-Year-kmax.csv")
     csv_file2 = os.path.join(ordnerpath,"Version-Year-kconfig.csv")
