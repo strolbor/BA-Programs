@@ -2,6 +2,8 @@ import os
 import csv
 import sys
 import time
+import pandas as pd
+
 
 ## Kurzbeschreibung
 
@@ -58,64 +60,6 @@ fmlist = [
         "kmax/linux/v6.7[x86].dimacs"
     ]
 
-
-# Funktion um Ordner zu holen
-def get_folders():
-    folders = []
-    folders = [folder for folder in os.listdir() if folder.startswith("solve_sat-") and os.path.isdir(folder)]
-    return folders
-
-# Funktion zum Laden der Daten für eine bestimmte Version des Feature-Modells
-def load_data_for_feature_model_version(feature_model_version):
-    data_dict = {}
-
-    # Suche nach Ordnern, die mit "solve_sat_" beginnen
-    folders = get_folders()
-    
-    for folder in folders:
-        csv_path = os.path.join(folder, 'output.csv')
-        if os.path.exists(csv_path):
-            with open(csv_path, 'r') as file:
-                csv_reader = csv.DictReader(file, delimiter=',')
-                data = list(csv_reader)
-                data_dict[folder] = data
-
-
-    # Filtern der Daten für die angegebene Version des Feature-Modells
-    filtered_data = {}
-    for solver, data in data_dict.items():
-        for row in data:
-            if row['dimacs-file'].startswith(feature_model_version):
-                if solver in filtered_data:
-                    filtered_data[solver].append(row)
-                else:
-                    filtered_data[solver] = [row]
-
-    return filtered_data
-
-# Funktion zum Laden der Daten für einen bestimmten SAT-Solver
-def load_data_for_solver(solver_name):
-    data_dict = {}
-
-    # Suche nach Ordnern, die mit "solve_sat_" beginnen
-    folders = get_folders()
-
-    for folder in folders:
-        csv_path = os.path.join(folder, 'output.csv')
-        if os.path.exists(csv_path):
-            with open(csv_path, 'r') as file:
-                csv_reader = csv.DictReader(file, delimiter=',')
-                data = list(csv_reader)
-                data_dict[folder] = data
-
-    # Filtern der Daten für den angegebenen SAT-Solver
-    filtered_data = {}
-    for solver, data in data_dict.items():
-        if str(solver).endswith(solver_name):
-            filtered_data[solver_name] =data # data
-        
-    return filtered_data
-
 def get_valid_input(prompt, validation_func):
     while True:
         user_input = input(prompt)
@@ -132,8 +76,6 @@ def is_valid_integer(input_str):
     except ValueError:
         return False
 
-def is_valid_str(input_str):
-    return isinstance(input_str, str) and len(input_str) > 0
 
 def find_matching_entry(array, prefix):
     for entry in array:
@@ -141,17 +83,17 @@ def find_matching_entry(array, prefix):
             return entry
     return None
 
-def printerFM(dateiname,feature_model_version,data_for_feature_model):
-    file_out = open(dateiname,"w")
-    file_out.write("dimacs-analyzer,dimacs-analyzer-time,model,statisfiable\n")
-    # FM-Modell: kconfigreader/linux/v2.6.20[i386].dimacs
-    model = feature_model_version.split("/")[2].split(".dimacs")[0]
-    for solver,data in data_for_feature_model.items():
-        tmpSTR = "{},{},{},{}".format(data[0]["dimacs-analyzer"].split("/")[1],data[0]["dimacs-analyzer-time"], model,"satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable")
-        #tmpSTR = data[0]["dimacs-analyzer"].split("/")[1] +","+ data[0]["dimacs-analyzer-time"] + "satisfiable" if bool(data[0]["model-satisfiable"]) == True else "not satisfiable"
-        file_out.write(tmpSTR+""+"\n")
-    file_out.flush()
-    file_out.close()
+# -------------------
+
+
+
+def load_data_from_csv(csv_path):
+    if os.path.exists(csv_path):
+        return pd.read_csv(csv_path)
+    else:
+        print("Die Datei {} existiert nicht.".format(csv_path))
+        return pd.DataFrame()
+
 
 
 
@@ -159,128 +101,58 @@ def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-
-"""Diese Funktion sucht und schreibt die Sachen für mod_SAT"""
-def mod_sat_write(matching,dateinameKmax,dateinameKconfig,dateinameALL):    
-    solver_name = matching #= "02-zchaff"
-    data_for_solver = load_data_for_solver(solver_name)
-
-    file = open(dateinameKmax,"w")
-    file2 = open(dateinameKconfig,"w")
-    file3 = open(dateinameALL,"w")
-    toWrite0 = "dimacs-analyzer,model-version,dimacs-analyzer-time,statisfiable,"+solver_name+"\n"
-    file.write(toWrite0)
-    file2.write(toWrite0)
-    file3.write(toWrite0)
-
-    for solver,data in data_for_solver.items():
-        for item in data:
-            towrite = ""+ \
-                item["dimacs-file"] + "," \
-                + str(item["dimacs-file"]).split("/")[2].split(".dimacs")[0] + "," \
-                + item["dimacs-analyzer-time"] + ","  \
-                + "satisfiable\n" if bool(item["model-satisfiable"]) == True else "not satisfiable\n" \
-                + solver_name
-            if "kmax" in item["dimacs-file"]:
-                file.write(towrite) 
-            elif "kconfig" in item["dimacs-file"]:
-                file2.write(towrite)
-            else:
-                print("unknow typ: "+item["dimacs-file"]) 
-            file3.write(towrite)
-    file.flush()
-    file.close()
-    file2.flush()
-    file2.close()
-    file3.flush()
-    file3.close()
-
-# HAupt Funktionen des Programmes
-
-def mod_FM():
-    i = 0
-    print("Verfügbare FM Models")
-    for entry in fmlist:
-        print(">",i,entry)
-        i+=1
-    
-    promt = "Bitte wählen sie den Index für das Modell"
-    tmp = get_valid_input(promt,is_valid_integer)
-    tmp = int(tmp)
-
-    if tmp > len(fmlist):
-        print("Zu großer Wert.")
-        exit()
-
-
-    feature_model_version = fmlist[tmp]
-    #feature_model_version = "kconfigreader/linux/v2.5.45[i386].dimacs"
-    
-
-    data_for_feature_model = load_data_for_feature_model_version(feature_model_version)
-    printerFM('FM-sort.csv',feature_model_version,data_for_feature_model)
-
-    print("\n")
-
-
-
+def is_kconfigreader(file_path):
+    return 'kconfigreader' in file_path
 
 def mod_FM_all():
+    print("Modus FM_all")
     ordnername = "sorted_by_FM"
     create_folder_if_not_exists(ordnername)
 
-    for entry in fmlist:
-        feature_model_version = entry
-        data_for_feature_model = load_data_for_feature_model_version(feature_model_version)
+    data = load_data_from_csv("solve_model-satisfiable/output.csv")
 
-        filename = feature_model_version.replace("/","-")
-        dateiname = os.path.join(ordnername,f'{filename}.csv')
+    zahler = 0
+    for feature_model_version in fmlist:
+        zahler +=1
+        # Daten vor der Filterung anzeigen
+        print("Daten vor der Filterung:", feature_model_version)
 
-        printerFM(dateiname,feature_model_version,data_for_feature_model)
-        
+        # KMAX logik
+        df_kmax = data[data['dimacs-file'].str.contains('kmax') & (data['dimacs-file'] == feature_model_version)]
+        datei_kmax = os.path.join(ordnername, feature_model_version.split("/")[2].replace(".dimacs","") + "-kmax.csv")
+        df_kmax = df_kmax.sort_values(by='dimacs-analyzer')
+        df_kmax.to_csv(datei_kmax, index=False)
 
-def mod_SAT():
-    ordnername = "sorted_by_SAT"
-    create_folder_if_not_exists(ordnername)
+        # KCONFIG logic
+        df_kconfigreader = data[data['dimacs-file'].str.contains('kconfigreader') & (data['dimacs-file'] == feature_model_version)]
+        datei_kconfig = os.path.join(ordnername, feature_model_version.split("/")[2].replace(".dimacs","") + "-kconfig.csv")
+        df_kconfigreader = df_kconfigreader.sort_values(by='dimacs-analyzer')
+        df_kconfigreader.to_csv(datei_kconfig, index=False)
 
-    # Sat Solvern suchen
-    folders = get_folders()
-    print("Verfügbare Sat-Solvern")
-    for item in folders:
-        print(item.split('_')[2],end=',')
-    print("\n")
+    print(zahler)
 
-    # Eingabe vom User erwarten
-    promt = "Bitte geben sie den Anfang der Eintrags an (also die zweistellige Jahr)"
-    tmp = get_valid_input(promt,is_valid_str)
-    find_user_input = "solve_sat-competition_" + tmp
+    # df_sorted = data.sort_values(by=['dimacs-analyzer', 'dimacs-file'])
+    # print(df_sorted)
 
-    # MAtching finden
-    matching = find_matching_entry(folders,find_user_input)
 
-    print("\n")
-    datei1 = os.path.join(ordnername,f"{matching}-kmax.csv") # Datei für kmax
-    datei2 = os.path.join(ordnername,f"{matching}-kconfig.csv") # Datei für kconfig
-    datei3 = os.path.join(ordnername,f"{matching}-all.csv") # Datei für alles
-    mod_sat_write(matching,datei1,datei2,datei3)
+    
 
-def mod_SAT_all():
-    ordnername = "sorted_by_SAT"
-    create_folder_if_not_exists(ordnername)
-    # Sat Solvern suchen
-    folders = get_folders()
-    for folder in folders:
-        datei1 = os.path.join(ordnername,f"{folder}-kmax.csv") # Datei für kmax
-        datei2 = os.path.join(ordnername,f"{folder}-kconfig.csv") # Datei für kconfig
-        datei3 = os.path.join(ordnername,f"{folder}-all.csv") # Datei für alles
-        mod_sat_write(folder,datei1,datei2,datei3)
+    # for feature_model_version in fmlist:
+    #     print(feature_model_version)
+    #     sorted_data = data.sort_values(by=['dimacs-analyzer','dimacs-file'])
+    #     print(sorted_data.head())
+
+
+ 
+
+
+
+
 
 
 def main_manuell():
     # Entscheiden was gesucht wird
     print("Willkommen im PArt Picker")
-    print("1. Modus: nach FM sortieren")
-    print("2. Modus: nach SAT-Solver sortieren")
     print("3. Batch für FM Sorted")
     print("4. Batch für SAT Sorted")
     print("0. zum Beenden")
@@ -289,16 +161,12 @@ def main_manuell():
     user_input = int(get_valid_input(prompt, is_valid_integer))
     if int(user_input) == 0:
         exit()
-    elif user_input == 1:
-        # FM soprtierung
-        mod_FM()
-    elif user_input == 2:
-        # SAT sortierung
-        mod_SAT()
+
     elif user_input == 3:
         mod_FM_all()
     elif user_input == 4:
-        mod_SAT_all()
+        pass
+        #mod_SAT_all()
     else:
         print("Bitte was verständliches eingeben.")
         main_manuell()
@@ -310,18 +178,14 @@ if __name__ == "__main__":
         main_manuell()
     else:
         start_time = time.time()
-        if int(sys.argv[1]) == 1:
-            mod_FM()
-        elif int(sys.argv[1]) == 2:
-            # SAT sortierung
-            mod_SAT()
-        elif int(sys.argv[1]) == 3:
+        if int(sys.argv[1]) == 3:
             mod_FM_all()
         elif int(sys.argv[1]) == 4:
-            mod_SAT_all()
+            pass
+            #mod_SAT_all()
         elif int(sys.argv[1]) == 9:
             mod_FM_all()
-            mod_SAT_all()
+            #mod_SAT_all()
         end_time = time.time()
         execution_time = end_time - start_time
         print("Ausführungszeit:", execution_time, "Sekunden")
