@@ -81,9 +81,10 @@ def separed_plotter(filter : str):
             csv_reader = csv.DictReader(file, delimiter=',')
             next(csv_reader)
             data_dict[csvdatei] = list(csv_reader)
-        
-        solver = csvdatei.split('_')[2] + ".png"
-        title = "Solver: " + csvdatei.split('_')[2].split("-all")[0] + f" ({filter})"
+
+        print(csvdatei)
+        solver = csvdatei.replace(".csv",".png")
+        title = "Solver: " + csvdatei.split('-')[1] + f" ({filter})"
         datei = os.path.join(ordnerPath,f"sat-{solver}-{filter}.png")
         plotter_fkt(data_dict, datei,title)
 
@@ -94,7 +95,7 @@ def tenGroup_plotter(filter :str):
     csvdaten = [datei for datei in dateien if datei.endswith(filter)]
 
     # Sortiere die CSV-Dateien nach dem Jahr
-    csvdaten.sort(key=lambda x: int(x.split('_')[2][:2]))
+    csvdaten.sort(key=lambda x: int(x.split('-')[1][:2]))
 
     # Iteriere über die CSV-Dateien
     for i in range(0, len(csvdaten), 10):

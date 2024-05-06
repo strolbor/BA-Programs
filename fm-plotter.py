@@ -23,7 +23,7 @@ def plot_csv_files(folder_path):
         with open(file_path, 'r') as f:
             csv_reader = csv.reader(f)
             next(csv_reader)  # Überspringe die Kopfzeile
-            data = [(row[0], int(row[1].split()[0])) for row in csv_reader]  # Nur die ersten beiden Spalten werden berücksichtigt
+            data = [(row[0].split("/")[1], int(row[1])) for row in csv_reader]  # Nur die ersten beiden Spalten werden berücksichtigt
             
         # Extrahiere die sortierten Daten in separate Listen
         solver_names, dimacs_analyzer_time = zip(*data)
