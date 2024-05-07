@@ -73,7 +73,7 @@ def plot_single_SAT(df, name):
         plt.plot(data['dimacs-file'], data['dimacs-analyzer-time'], marker='o', linestyle='-', label=solver)
     plt.xlabel('Feature Modell')
     plt.ylabel('Zeit in ns')
-    plt.title(name.split("/")[1])
+    plt.title("Geordnet nach Solver: " + name.split("/")[1])
     plt.xticks(rotation=90)
     plt.grid(True)
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
@@ -169,22 +169,57 @@ def plot_all_FM(df,name):
     plt.close()
 
 
-def get_median(df,name):
+def get_median(df : pd.core.frame.DataFrame,name):
     """Diese Funktion filtert, den Median heraus.
     Tauscht Endung .csv mit -median.csv aus"""
-    df = df.sort_values(by=['dimacs-analyzer','dimacs-file','iteration'])
-    df = df[df['iteration'] == 3]
     name = name.replace(".csv","-median.csv")
+    # Alte Variante
+    # df = df.sort_values(by=['dimacs-analyzer','dimacs-file'])
+    # #df = df[df['iteration'] == 3]
+    # # # TODO: nach den mathematischen Median suchen - ohne die Iteration spalte beachten
+    # name = name.replace(".csv","-median.csv")
 
-    save_csv(df,name)
-    return df
+    # save_csv(df,name)
+    # return df
+
+    # DataFrame nach "dimacs-analyzer-time" sortieren
+    sorted_df = df.sort_values(by='dimacs-analyzer-time')
+
+    # Gruppieren nach ['dimacs-analyzer', 'dimacs-file'] und Median berechnen
+    median_grouped = sorted_df.groupby(['dimacs-analyzer', 'dimacs-file']).median()
+    median_grouped.to_csv(name)
+    # man muss es neu einlesen, sonst kommt ein Fehler
+    # kp warum
+    turn_df = pd.read_csv(name)
+    return turn_df
+
 
 def save_csv(df,name):
     """speichert das DataFrame in eine csv Datei"""
     df.to_csv(name,index=False)
 
 
+
 # Hauptfunktionen
+
+def all_save_SAT(df,filterReader,ordnername):
+    datei_mod = os.path.join(ordnername, "sat-all"+ f"-{filterReader}.csv")
+    df = df[df['dimacs-file'].str.contains(filterReader)]
+    if not df.empty:
+        # alle Daten speichern ohne Median Filter
+        save_csv(df,datei_mod)
+
+        # Bild plotten
+        plot_all_SAT(get_median(df,datei_mod),datei_mod.replace(".csv",".png"))
+
+def save_single_entry_SAT(df,filterReader, filterVersion, ordnername):
+    df = df[df['dimacs-file'].str.contains(filterReader) & (df['dimacs-analyzer'] == filterVersion)]
+    # sat-competition/07-RSat
+    datei_mod = os.path.join(ordnername, filterVersion.split("/")[1]+ f"-{filterReader}.csv")
+    df = df.sort_values(by='dimacs-file')
+    if not df.empty:
+        save_csv(df,datei_mod)
+        plot_single_SAT(get_median(df,datei_mod),datei_mod.replace(".csv",".png"))
 
 def mod_SAT_all():
     print("Modus SAT_all")
@@ -198,54 +233,40 @@ def mod_SAT_all():
     zahler = 0
 
     # Alle Plots zusammen fassen
-    datei_all_kmax = os.path.join(ordnername, "sat-all"+ "-kmax.csv")
-    all_kmax = data[data['dimacs-file'].str.contains('kmax')]
-    if not all_kmax.empty:
-        # alle Daten speichern ohne Median Filter
-        save_csv(all_kmax,datei_all_kmax)
-
-        # Bild plotten
-        plot_all_SAT(get_median(all_kmax,datei_all_kmax),datei_all_kmax.replace(".csv",".png"))
-
-    datei_all_kcon = os.path.join(ordnername, "sat-all"+ "-kconfigreader.csv")
-    all_kcon = data[data['dimacs-file'].str.contains('kconfigreader')]
-    if not all_kcon.empty: 
-         # alle Daten speichern ohne Median Filter
-        save_csv(all_kcon,datei_all_kcon)
-
-        # Bild plotten
-        plot_all_SAT(get_median(all_kcon,datei_all_kcon),datei_all_kcon.replace(".csv",".png"))
+    all_save_SAT(data,'kmax',ordnername)
+    all_save_SAT(data,'kconfigreader',ordnername)
 
     # Durchlaufe jeden Solver
     # Speichere zu jeden Feature Modell die entsprechenden Solver
-    # Plotte die dabei erstellte csv Datei als Plot ab.
+    
     for entry in df2:
         sat_program = entry[0]
         zahler +=1
 
          # KMAX logic
-        df_kmax = data[data['dimacs-file'].str.contains('kmax') & (data['dimacs-analyzer'] == sat_program)]
-        # sat-competition/07-RSat
-        datei_kmax = os.path.join(ordnername, sat_program.split("/")[1]+ "-kmax.csv")
-        df_kmax = df_kmax.sort_values(by='dimacs-file')
-        if not df_kmax.empty:
-            save_csv(df_kmax,datei_kmax)
-            plot_single_SAT(get_median(df_kmax,datei_kmax),datei_kmax.replace(".csv",".png"))
-
-
+        save_single_entry_SAT(data,'kmax',sat_program,ordnername)
         # KCONFIG logic
-        #kconfigreader/linux/v2.6.1[i386]
-        df_kconfigreader = data[data['dimacs-file'].str.contains('kconfigreader') & (data['dimacs-analyzer'] == sat_program)]
-        datei_kconfig = os.path.join(ordnername, sat_program.split("/")[1] + "-kconfig.csv")
-        df_kconfigreader = df_kconfigreader.sort_values(by='dimacs-file')
-        if not df_kconfigreader.empty:
-            save_csv(df_kconfigreader,datei_kconfig)
-            plot_single_SAT(get_median(df_kconfigreader,datei_kconfig),datei_kconfig.replace(".csv",".png"))
+        save_single_entry_SAT(data,'kconfigreader',sat_program,ordnername)
     
 
-def all_save_FM():
-    pass
- 
+def all_save_FM(df,filterarg,ordnername):
+    """Hilfs Funktion um all-Plots zu saven"""
+    df_datei = os.path.join(ordnername, "fm-all"+ f"-{filterarg}.csv")
+    df = df[df['dimacs-file'].str.contains(filterarg)]
+    if not df.empty:
+        save_csv(df,df_datei)
+        plot_all_FM(get_median(df,df_datei),df_datei.replace(".csv",".png"))
+
+def save_single_entry_FM(df,filterREADER,filterVersion,ordnername):
+    """Hilfsfunktion um einen einzelnen Graph zu speichern als plot und csv"""
+    df_mod = df[df['dimacs-file'].str.contains(filterREADER) & (df['dimacs-file'] == filterVersion)]
+    datei_mod = os.path.join(ordnername, filterVersion.split("/")[2].replace(".dimacs","") + f"-{filterREADER}.csv")
+    
+    df_mod = df_mod.sort_values(by='dimacs-analyzer')
+    if not df_mod.empty:
+        save_csv(df_mod,datei_mod)
+        plot_all_FM(get_median(df_mod,datei_mod),datei_mod.replace(".csv",".png"))
+
 def mod_FM_all():
     print("Modus FM_all")
     ordnername = "sorted_by_FM"
@@ -263,20 +284,8 @@ def mod_FM_all():
 
     # Alle Solver
     # Alle Plots zusammen fassen
-    datei_all_kmax = os.path.join(ordnername, "fm-all"+ "-kmax.csv")
-    all_kmax = data[data['dimacs-file'].str.contains('kmax')]
-    if not all_kmax.empty:
-        save_csv(all_kmax,datei_all_kmax)
-        plot_all_FM(get_median(all_kmax,datei_all_kmax),datei_all_kmax.replace(".csv",".png"))
-
-    datei_all_kcon = os.path.join(ordnername, "fm-all"+ "-kconfigreader.csv")
-    all_kcon = data[data['dimacs-file'].str.contains('kconfigreader')]
-    if not all_kcon.empty: 
-        save_csv(all_kcon,datei_all_kcon)
-        plot_all_FM(get_median(all_kcon,datei_all_kcon),datei_all_kcon.replace(".csv",".png"))
-
-
-
+    all_save_FM(data,'kmax',ordnername)
+    all_save_FM(data,'kconfigreader',ordnername)
 
     
     # Durchlaufe jeden Feature Modell
@@ -287,25 +296,13 @@ def mod_FM_all():
         zahler +=1
 
         # KMAX logic
-        df_kmax = data[data['dimacs-file'].str.contains('kmax') & (data['dimacs-file'] == feature_model_version)]
-        datei_kmax = os.path.join(ordnername, feature_model_version.split("/")[2].replace(".dimacs","") + "-kmax.csv")
-        df_kmax = df_kmax.sort_values(by='dimacs-analyzer')
-        if not df_kmax.empty:
-            save_csv(df_kmax,datei_kmax)
-            plot_all_FM(get_median(df_kmax,datei_kmax),datei_kmax.replace(".csv",".png"))
-
+        save_single_entry_FM(data,'kmax',feature_model_version,ordnername)
 
         # KCONFIG logic
-        #kconfigreader/linux/v2.6.1[i386]
-        df_kconfigreader = data[data['dimacs-file'].str.contains('kconfigreader') & (data['dimacs-file'] == feature_model_version)]
-        datei_kconfig = os.path.join(ordnername, feature_model_version.split("/")[2].replace(".dimacs","") + "-kconfig.csv")
-        
-        df_kconfigreader = df_kconfigreader.sort_values(by='dimacs-analyzer')
-        if not df_kconfigreader.empty:
-            save_csv(df_kconfigreader,datei_kconfig)
-            plot_all_FM(get_median(df_kconfigreader,datei_kconfig),datei_kconfig.replace(".csv",".png"))
+        save_single_entry_FM(data,'kconfigreader',feature_model_version,ordnername)
 
     print("zahler",zahler)
+
 
 
 
