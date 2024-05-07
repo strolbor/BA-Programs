@@ -63,7 +63,7 @@ MODUS_SAT = 2
 def plot_single_SAT(df, name):
     df['dimacs-file'] = df['dimacs-file'].str.replace('kconfigreader/linux/', '')
     df['dimacs-file'] = df['dimacs-file'].str.replace('kmax/linux/', '')
-    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '')
+    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '',regex=False)
     df['dimacs-analyzer'] = df['dimacs-analyzer'].str.replace('sat-competition/','')
 
 
@@ -85,7 +85,7 @@ def plot_single_SAT(df, name):
 def plot_single_FM(df, name):
     df['dimacs-file'] = df['dimacs-file'].str.replace('kconfigreader/linux/', '')
     df['dimacs-file'] = df['dimacs-file'].str.replace('kmax/linux/', '')
-    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '')
+    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '',regex=False)
     df['dimacs-analyzer'] = df['dimacs-analyzer'].str.replace('sat-competition/','')
 
 
@@ -146,7 +146,7 @@ def plot_all_FM(df,name):
 
     df['dimacs-file'] = df['dimacs-file'].str.replace('kconfigreader/linux/', '')
     df['dimacs-file'] = df['dimacs-file'].str.replace('kmax/linux/', '')
-    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '')
+    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '',regex=False)
     df['dimacs-analyzer'] = df['dimacs-analyzer'].str.replace('sat-competition/','')
 
 
