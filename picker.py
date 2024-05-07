@@ -304,26 +304,6 @@ def mod_FM_all():
     print("zahler",zahler)
 
 
-
-
-def plot_combined_data(df, name, xlabel, ylabel, title):
-    plt.figure(figsize=(12, 6))
-    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
-    groups = df.groupby('group')
-    for i, (group, data) in enumerate(groups):
-        plt.plot(data[xlabel], data[ylabel], label=group, color=colors[i % len(colors)], marker='o', linestyle='-')
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.xticks(rotation=90)
-    plt.grid(True, which="both", ls="--")
-    plt.title(title)
-    plt.tight_layout(rect=[0, 0, 0.7, 1])
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Solver")
-    plt.savefig(name)
-    plt.close()
-
-
-
 def main_manuell():
     # Entscheiden was gesucht wird
     print("Willkommen im PArt Picker")
@@ -356,8 +336,6 @@ if __name__ == "__main__":
         elif int(sys.argv[1]) == 2:
             pass
             mod_SAT_all()
-        # elif int(sys.argv[1]) == 8:
-        #     SAT_10_plotter()
         elif int(sys.argv[1]) == 9:
             mod_FM_all()
             mod_SAT_all()
