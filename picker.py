@@ -129,7 +129,7 @@ def plot_all_SAT(df,name):
     plt.xticks(rotation=90)  # x-Achsenbeschriftungen vertikal ausrichten
     #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
     plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
-    plt.title('Geordnet nach SAT Solvern')  # Titel des Plots festlegen
+    plt.title('SAT Solvern Vergleich')  # Titel des Plots festlegen
 
     # Plot anzeigen
     plt.tight_layout(rect=[0, 0, 0.7, 1])
@@ -160,7 +160,7 @@ def plot_all_FM(df,name):
     plt.xticks(rotation=90)  # x-Achsenbeschriftungen vertikal ausrichten
     #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
     plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
-    plt.title('Geordnet nach Feature Modell')  # Titel des Plots festlegen
+    plt.title('Feature Modell Vergleich')  # Titel des Plots festlegen
 
     # Plot anzeigen
     plt.tight_layout(rect=[0, 0, 0.7, 1])
