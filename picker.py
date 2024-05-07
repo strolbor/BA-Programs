@@ -56,7 +56,6 @@ def create_folder_if_not_exists(folder_path):
 
 
 
-
 MODUS_FM = 1
 MODUS_SAT = 2
 

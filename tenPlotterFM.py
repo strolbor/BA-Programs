@@ -26,7 +26,7 @@ def tenPlot(dateiReadName,prefix):
 
     # Iteration über die Gruppen und Erstellung von Diagrammen
     for name, group in groups:
-        if plot_count % 10 == 0:
+        if plot_count % 10 == 0 and plot_count != 0:
             # Diagramm speichern
             plt.savefig(os.path.join("sorted_by_FM",f'tengroup-{plot_count}-{plot_count + 9}-{prefix}.png'), bbox_inches='tight')
             plt.close()

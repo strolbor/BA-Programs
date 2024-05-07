@@ -26,9 +26,9 @@ def tenPlot(dateiReadName, prefix):
 
     # Iteration über die Gruppen und Erstellung von Diagrammen
     for name, group in groups:
-        if plot_count % 10 == 0:
+        if plot_count % 10 == 0 and plot_count != 0:
             # Diagramm speichern
-            plt.savefig(os.path.join("sorted_by_SAT", f'sat-{prefix}-tengroup-{plot_count}-{plot_count + 9}.png'), bbox_inches='tight')
+            plt.savefig(os.path.join("sorted_by_SAT", f'tengroup-{prefix}-{plot_count}-{plot_count + 9}.png'), bbox_inches='tight')
             plt.close()
             # Neues Diagramm erstellen
             plt.figure(figsize=(10,6))
@@ -46,7 +46,7 @@ def tenPlot(dateiReadName, prefix):
         
         plot_count += 1
 
-    plt.savefig(os.path.join("sorted_by_SAT", f'sat-{prefix}-tengroup-{plot_count}-{plot_count + 9}.png'), bbox_inches='tight')
+    plt.savefig(os.path.join("sorted_by_SAT", f'tengroup-{prefix}-{plot_count}-{plot_count + 9}.png'), bbox_inches='tight')
     plt.close()
 
 

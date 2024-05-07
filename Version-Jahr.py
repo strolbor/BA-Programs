@@ -12,6 +12,13 @@ def convert_short_year(short_year):
     year_str = short_year.split("[")[0].split("v")[-1]
     return int(year_str)+2000
 
+def create_folder_if_not_exists(folder_path):
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+ordnername = "sorted_verlauf"
+create_folder_if_not_exists(ordnername)
+
 linux_versions = {
     'v2.5.45': '2002',
     'v2.5.54': '2003',
@@ -52,14 +59,18 @@ sat_kmax['Year-DIMACS'] = sat_kmax['dimacs-file'].apply(lambda x: get_year(x.spl
 sat_kconfigreader['Year-SOLVER'] = sat_kconfigreader['dimacs-analyzer'].apply(lambda x: convert_short_year(x.split("/")[1].split("-")[0]))
 sat_kmax['Year-SOLVER'] = sat_kmax['dimacs-analyzer'].apply(lambda x: convert_short_year(x.split("/")[1].split("-")[0]))
 
-sat_kmax.to_csv("fm-year.txt.csv",index=False)
 # Filter nach JAhr DIMAXs == Jahr Solver
 
 filtered_kmax = sat_kmax[sat_kmax['Year-DIMACS'] == sat_kmax['Year-SOLVER']]
 filtered_kconfig = sat_kconfigreader[sat_kconfigreader['Year-DIMACS'] == sat_kconfigreader['Year-SOLVER']]
 
+# Speichern als csv
+filtered_kconfig.to_csv(os.path.join(ordnername,"Version-Jahr-kconfig.csv"),index=False)
+filtered_kmax.to_csv(os.path.join(ordnername,"Version-Jahr-kmax.csv"),index=False)
+
 # Plot
 def plotter(df,suffix):
+    global ordnername
     plt.figure(figsize=(10, 6))
     plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], label='Verlauf', color='blue')
     plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], marker='o')
@@ -69,7 +80,7 @@ def plotter(df,suffix):
     plt.xticks(rotation=90)
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
-    plt.savefig(os.path.join(f'FM-SAT-Jahr-Plot-{suffix}.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername,f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
 
 #filtered_kmax = filtered_kmax[filtered_kmax['Year-DIMACS'] == filtered_kmax['Year-SOLVER']]
 plotter(filtered_kmax,"kmax")
