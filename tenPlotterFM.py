@@ -17,6 +17,8 @@ def tenPlot(dateiReadName,prefix):
     # Präfix entfernen und Daten vorbereiten
     df['dimacs-file'] = df['dimacs-file'].apply(lambda x: remove_prefix(x, "kmax/linux/"))
     df['dimacs-file'] = df['dimacs-file'].apply(lambda x: remove_prefix(x, "kconfigreader/linux/"))
+    df['dimacs-analyzer'] = df['dimacs-analyzer'].apply(lambda x: remove_prefix(x, "sat-competition/"))
+    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '',regex=False)
 
     # Gruppenbildung nach dimacs-analyzer
     groups = df.groupby('dimacs-analyzer')
@@ -40,9 +42,10 @@ def tenPlot(dateiReadName,prefix):
         plt.ylabel('Zeit')
         plt.title(f'Zeit für DIMACS-Analyzer {prefix}')
         plt.xticks(rotation=90)
+        plt.grid(True)
         
         # Legende außerhalb des Graphen platzieren
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Solver")
         
         plot_count += 1
 

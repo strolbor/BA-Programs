@@ -75,7 +75,7 @@ def plot_single_SAT(df, name):
     plt.title("Geordnet nach Solver: " + name.split("/")[1])
     plt.xticks(rotation=90)
     plt.grid(True)
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Solver")
     plt.tight_layout()
 
     plt.savefig(os.path.join(name))
@@ -98,7 +98,7 @@ def plot_single_FM(df, name):
     plt.title(name.split("/")[1])
     plt.xticks(rotation=90)
     plt.grid(True)
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Feature Modell")
     plt.tight_layout()
 
     plt.savefig(os.path.join(name))
@@ -163,7 +163,7 @@ def plot_all_FM(df,name):
 
     # Plot anzeigen
     plt.tight_layout(rect=[0, 0, 0.7, 1])
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Solver")  # Legende anpassen
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Feature Modell")  # Legende anpassen
     plt.savefig(name)  # Plot speichern
     plt.close()
 

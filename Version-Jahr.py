@@ -69,7 +69,20 @@ filtered_kconfig.to_csv(os.path.join(ordnername,"Version-Jahr-kconfig.csv"),inde
 filtered_kmax.to_csv(os.path.join(ordnername,"Version-Jahr-kmax.csv"),index=False)
 
 # Plot
-def plotter(df,suffix):
+# def plotter(df,suffix):
+#     global ordnername
+#     plt.figure(figsize=(10, 6))
+#     plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], label='Verlauf', color='blue')
+#     plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], marker='o')
+#     plt.xlabel('Jahr')
+#     plt.ylabel('Zeit')
+#     plt.title('Zeit vs. FM & Solver aus dem gleichen Jahr')
+#     plt.xticks(rotation=90)
+#     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+#     plt.grid(True)
+#     plt.savefig(os.path.join(ordnername,f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
+
+def plotter(df, suffix):
     global ordnername
     plt.figure(figsize=(10, 6))
     plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], label='Verlauf', color='blue')
@@ -77,10 +90,11 @@ def plotter(df,suffix):
     plt.xlabel('Jahr')
     plt.ylabel('Zeit')
     plt.title('Zeit vs. FM & Solver aus dem gleichen Jahr')
-    plt.xticks(rotation=90)
+    plt.xticks(df['Year-DIMACS'].unique(), rotation=90)  # This ensures all unique years are marked on the x-axis
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
-    plt.savefig(os.path.join(ordnername,f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
+
 
 #filtered_kmax = filtered_kmax[filtered_kmax['Year-DIMACS'] == filtered_kmax['Year-SOLVER']]
 plotter(filtered_kmax,"kmax")
