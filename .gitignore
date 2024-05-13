@@ -3,3 +3,4 @@
 
 # Whitelist specific files or directories
 !*py
+!README.md

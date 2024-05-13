@@ -20,8 +20,12 @@ def tenPlot(dateiReadName,prefix):
     df['dimacs-analyzer'] = df['dimacs-analyzer'].apply(lambda x: remove_prefix(x, "sat-competition/"))
     df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '',regex=False)
 
+    # Nur für FM
+    df.sort_values(by='Year-SOLVER', inplace=True)
+
+
     # Gruppenbildung nach dimacs-analyzer
-    groups = df.groupby('dimacs-analyzer')
+    groups = df.groupby('dimacs-file')
 
     # Counter für die Anzahl der Plots
     plot_count = 0
@@ -34,14 +38,24 @@ def tenPlot(dateiReadName,prefix):
             plt.close()
             # Neues Diagramm erstellen
             plt.figure(figsize=(10,6))
-        
-        plt.plot(group['dimacs-file'], group['dimacs-analyzer-time'], marker='o', label=name)
-        
+
+
+        # dimacs-file == Year-DIMACS
+        # dimacs-analyzer == Year-SOLVER  
+        plot_x = 'Year-SOLVER'
+        plot_y = 'dimacs-analyzer-time'
+        # Für FM:
+        # - dimacs analyzer / Year-SOLVER 
+        # - Time
+        #plt.plot(group['Year-DIMACS'], group['dimacs-analyzer-time'], marker='o', label=name)
+        plt.plot(group[plot_x], group[plot_y], marker='o', label=name) # ist für SAT
+
+
         # Diagrammformatierung
-        plt.xlabel('DIMACS File')
-        plt.ylabel('Zeit')
-        plt.title(f'Zeit für DIMACS-Analyzer {prefix}')
-        plt.xticks(rotation=90)
+        plt.xlabel('Feature Modell Jahr')
+        plt.ylabel('Nanosekunden')
+        plt.title(f'Zeit für SAT-Solver ({prefix})')
+        plt.xticks(df[plot_x].unique(),rotation=90) 
         plt.grid(True)
         
         # Legende außerhalb des Graphen platzieren
