@@ -11,6 +11,10 @@ print("Pearson's correlation coefficient:", correlation)
 
 # Perform linear regression
 slope, intercept, r_value, p_value, std_err = linregress(data['Year-DIMACS'], data['dimacs-analyzer-time'])
+print("Steigung",slope)
+print("Achsenabschnitt mit y Achse",intercept)
+print("Stärke und Richtung einer linearen Beziehung",r_value)
+print("Standardfehler der Steigung",std_err)
 
 # Create the scatter plot
 plt.scatter(data['Year-DIMACS'], data['dimacs-analyzer-time'], color='blue', label='Data Points')
@@ -19,8 +23,8 @@ plt.scatter(data['Year-DIMACS'], data['dimacs-analyzer-time'], color='blue', lab
 plt.plot(data['Year-DIMACS'], intercept + slope * data['Year-DIMACS'], 'r', label='Fitted line')
 
 # Label the axes and add a legend
-plt.xlabel('Year-DIMACS')
-plt.ylabel('dimacs-analyzer-time')
+plt.xlabel('JAhr des FM')
+plt.ylabel('Nanosekunden')
 plt.title('Regression Line and Pearson Correlation')
 plt.legend()
 

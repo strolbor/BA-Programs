@@ -267,7 +267,7 @@ def mod_SAT_all():
 
 # FM
 
-def plot_all_FM(df,name):
+def plot_all_FM(df,name,ReaderStr):
     """Speichert die Daten als Plot."""
     # Plot erstellen
     plt.figure(figsize=(12, 6))
@@ -302,7 +302,7 @@ def plot_all_FM(df,name):
 
     #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
     plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
-    plt.title('Feature Modell Vergleich')  # Titel des Plots festlegen
+    plt.title(f'Feature Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
 
     # Plot anzeigen
     plt.tight_layout(rect=[0, 0, 0.7, 1])
@@ -317,7 +317,7 @@ def all_save_FM(df,filterarg,ordnername):
     if not df.empty:
         # Speichere das Diagramm als csv Datei
         save_csv(df,df_datei)
-        plot_all_FM(get_median(df,df_datei),df_datei.replace(".csv",".png"))
+        plot_all_FM(get_median(df,df_datei),df_datei.replace(".csv",".png"),filterarg)
 
 def save_single_entry_FM(df,filterREADER,filterVersion,ordnername):
     """Hilfsfunktion um einen einzelnen Graph zu speichern als plot und csv"""
@@ -334,7 +334,7 @@ def save_single_entry_FM(df,filterREADER,filterVersion,ordnername):
         datei_mod = os.path.join(ordnername, str(tmp[0]) + f"-{filterREADER}.csv")
         
         save_csv(df_mod,datei_mod)
-        plot_all_FM(get_median(df_mod,datei_mod),datei_mod.replace(".csv",".png"))
+        plot_all_FM(get_median(df_mod,datei_mod),datei_mod.replace(".csv",".png"),filterREADER)
 
 def mod_FM_all():
     print("Modus FM_all")
