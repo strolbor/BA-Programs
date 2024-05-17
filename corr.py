@@ -22,6 +22,10 @@ plt.scatter(data['Year-DIMACS'], data['dimacs-analyzer-time'], color='blue', lab
 # Add the regression line
 plt.plot(data['Year-DIMACS'], intercept + slope * data['Year-DIMACS'], 'r', label='Fitted line')
 
+print("1: ",(intercept + slope * data['Year-DIMACS']).corr(data['Year-DIMACS']))
+print("2: ",(5 * data['dimacs-analyzer-time'] **2).corr(data['Year-DIMACS']))
+
+
 # Label the axes and add a legend
 plt.xlabel('JAhr des FM')
 plt.ylabel('Nanosekunden')
