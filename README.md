@@ -33,5 +33,15 @@ um weitere Plots zu den SAT & FM zu erhalten:
 
 
 ## 4 Schritt
+
+Führe: 
+```sh corr-test.py``` 
+aus um Informationen zu den Wachstumgradizent zu erhalten:
+- Lineare Regression
+- log-lineare Regression (um exponentielles Wachstum nachzu weisen).
+- Den Wert mit den höchsten pearson Wachstumgradienten ist das Ding der Wahl
+- Für QQ Plots Analyse haben wir zu wenige Daten
+
+
 - Pandas (persons korrelations quoeffizenten )
   - https://stackoverflow.com/questions/25571882/pandas-columns-correlation-with-statistical-significance

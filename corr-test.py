@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import argparse
+from scipy.stats import linregress
 
 
 # Daten erstellen
@@ -11,78 +12,117 @@ data = {
     "dimacs-analyzer-time": [28575826.0, 26733080.0, 45946024.0, 55658457.0, 34892681.0, 75663773.0, 100024789.0, 129064740.0, 138120070.0, 167769804.0, 216313122.0, 251240199.0, 177809116.0, 193798121.0, 319234057.0, 346222497.0, 272316746.0, 394456116.0, 477582431.0, 503941762.0, 417442879.0, 535173892.0, 597433451.0]
 }
 
-def linTester(dateiname):
-    #df = pd.DataFrame(dateiname)
-    df = pd.read_csv(dateiname)
+def Tester(dateiname):
+    """überprüft ob die Daten Linear & exponentiell verteilt sind ist.
+    Mithilfe von Pearson"""
+    print("--- BEIDES ---")
+
+    df = pd.DataFrame(data)
+    #df = pd.read_csv(dateiname)
 
     # Lineare Regression durchführen
-    X = df[["Year-DIMACS"]]
-    y = df[["dimacs-analyzer-time"]]
+    linX = df[["Year-DIMACS"]]
+    liny = df[["dimacs-analyzer-time"]]
+    
     model = LinearRegression()
-    model.fit(X, y)
+    model.fit(linX, liny)
+    
+    # Regressionskoeffizienten
+    linIntercept = model.intercept_
+    linSlope = model.coef_[0]
+    
+    # andere Werte
+    # Perform linear regression
+    linSlope2, linIntercept2, lin_r_value, lin_p_value, lin_std_err = linregress(data['Year-DIMACS'], data['dimacs-analyzer-time'])
+
+
 
     # Ausgleichsgerade berechnen
-    df['predicted'] = model.predict(X)
+    df['predicted'] = model.predict(linX)
 
     # Korrelation berechnen zw. YEAR-Dimacs und Analyse Zeit
-    correlation = df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson').iloc[0, 1]
-    #print(df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson'))
-    print(f"corr1: r={correlation}")
+    LinCorrelation = df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson').iloc[0, 1]
+    #print(df[['Year-DIMACS', 'dimacs-analyzer-time','predicted']].corr(method='pearson'))
 
-    # Korrelation zwischen Gerade und realen Werten herstellen
-    correlation2 = df[['predicted','Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson')#.iloc[0,1]
-    print(correlation2)
-    #print(f"corr2: r={correlation2}")
+    #
+    ## EXPO Test
+    # 
+
+    # Log-Transformation der abhängigen Variable y
+    df['log_dimacs-analyzer-time'] = np.log(df['dimacs-analyzer-time'])
+
+    # Lineares Regressionsmodell erstellen und anpassen
+    expoX = df[["Year-DIMACS"]].values # Unabhängige Variable (muss 2D-Array sein)
+    expoy = df[["log_dimacs-analyzer-time"]].values  # Transformierte abhängige Variable
+
+    model = LinearRegression()
+    model.fit(expoX, expoy)
+
+    expoIntercept = model.intercept_
+    expoSlope = model.coef_[0]
+
+    # Vorhersage der transformierten y-Werte (log_y)
+    df['predicted_log_dimacs-analyzer-time'] = model.predict(expoX)
+
+    # Rücktransformation der vorhergesagten Werte
+    df['predicted_dimacs-analyzer-time_expo'] = np.exp(df['predicted_log_dimacs-analyzer-time'])
+
+    # Korrelation berechnen zw. YEAR-Dimacs und Analyse Zeit
+    expo_correlation = df[['Year-DIMACS', 'predicted_dimacs-analyzer-time_expo']].corr(method='pearson').iloc[0, 1]
+    #print(df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson'))
+    print(f"corr1: r={expo_correlation}")
+
+    expoSlope2, expoIntercept2, expo_r_value, expo_p_value, expo_std_err = linregress(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'])
+
+    series = {
+        'Dataname': dateiname,
+        'lin_intercept': linIntercept[0],
+        'lin_slope': linSlope[0],
+        'lin_p_wert': lin_p_value,
+        'lin_std_err': lin_std_err,
+        'lin_pearson_corr': LinCorrelation,
+        
+        'expoIntercept2': expoIntercept[0],
+        'expoSlope': expoSlope[0],
+        'expo_r_value': expo_r_value,
+        'expo_p_value': expo_p_value,
+        'expo_std_err':expo_std_err,
+        'expo_pearson_corr': expo_correlation
+                       
+    }
+
+
+    #
+    ## Ergebnisse
+    # 
 
     # Ergebnisse darstellen
     plt.figure(figsize=(10, 5))
     plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], color='blue', label='Actual data')
-    plt.plot(df['Year-DIMACS'], df['predicted'], color='red', label=f'Fit line, Pearson r={correlation:.2f}')
+    plt.plot(df['Year-DIMACS'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
+    plt.plot(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-lionear Regression), Pearson r={expo_correlation:.2f}')
     plt.xlabel('Year-DIMACS')
     plt.ylabel('dimacs-analyzer-time')
     plt.title('Lineare Regression und Korrelationsanalyse')
     plt.xticks(df["Year-DIMACS"].unique(),rotation=90)
     plt.legend()
+    plt.savefig('test.png')  # Plot speichern
     plt.show()
-
-
-def expoTester(dateipath):
-    #df = pd.DataFrame(data)
-    df = pd.read_csv(dateipath)
+    plt.close()
     
-    # Logarithmieren der dimacs-analyzer-time für exponentielle Anpassung
-    #df['log_dimacs-analyzer-time'] = np.log(df['dimacs-analyzer-time'])
 
-    # Exponentielle Regression durchführen (lineare Regression auf den log-transformierten Daten)
-    X = df[["Year-DIMACS"]]
-    y_log = df['dimacs-analyzer-time']
-    model_exp = LinearRegression()
-    model_exp.fit(X, y_log)
+    print(series)
+    return series
 
-    # Vorhersagen in den originalen Maßstab zurücktransformieren
-    df['predicted_exp'] = model_exp.predict(X)
-
-    # Korrelation der ursprünglichen und vorhergesagten Werte berechnen
-    correlation_exp = np.corrcoef(df['dimacs-analyzer-time'], df['predicted_exp'])[0, 1]
-
-    # Ergebnisse darstellen
-    plt.figure(figsize=(10, 5))
-    plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], color='blue', label='Actual data')
-    plt.plot(df['Year-DIMACS'], df['predicted_exp'], color='green', label=f'Exponential Fit, Pearson r={correlation_exp:.2f}')
-    plt.xlabel('Year-DIMACS')
-    plt.ylabel('dimacs-analyzer-time')
-    plt.title('Exponentielle Regression und Korrelationsanalyse')
-    plt.xticks(df["Year-DIMACS"].unique(),rotation=90)
-    plt.legend()
-    plt.show()
 
 def main():
     parser = argparse.ArgumentParser(description='Perform linar/exponential regression on DIMACS data.')
     parser.add_argument('csv_path', type=str, help='The path to the csv file containing the data.')
 
     args = parser.parse_args()
-    linTester(args.csv_path)
+    #linTester(args.csv_path)
     #expoTester(args.csv_path)
+    Tester(args.csv_path)
 
 if __name__ == "__main__":
     main()
