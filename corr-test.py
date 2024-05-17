@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import argparse
 from scipy.stats import linregress
-
+import os
 
 # Daten erstellen
 data = {
@@ -78,11 +78,12 @@ def Tester(dateiname):
         'Dataname': dateiname,
         'lin_intercept': linIntercept[0],
         'lin_slope': linSlope[0],
+        'lin_r_value': lin_r_value,
         'lin_p_wert': lin_p_value,
         'lin_std_err': lin_std_err,
         'lin_pearson_corr': LinCorrelation,
         
-        'expoIntercept2': expoIntercept[0],
+        'expoIntercept': expoIntercept[0],
         'expoSlope': expoSlope[0],
         'expo_r_value': expo_r_value,
         'expo_p_value': expo_p_value,
@@ -100,18 +101,18 @@ def Tester(dateiname):
     plt.figure(figsize=(10, 5))
     plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], color='blue', label='Actual data')
     plt.plot(df['Year-DIMACS'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
-    plt.plot(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-lionear Regression), Pearson r={expo_correlation:.2f}')
+    plt.plot(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-linear Regression), Pearson r={expo_correlation:.2f}')
     plt.xlabel('Year-DIMACS')
     plt.ylabel('dimacs-analyzer-time')
     plt.title('Lineare Regression und Korrelationsanalyse')
     plt.xticks(df["Year-DIMACS"].unique(),rotation=90)
     plt.legend()
-    plt.savefig('test.png')  # Plot speichern
-    plt.show()
+    plt.savefig(dateiname.replace("-median.csv","-regression-test.png"))  # Plot speichern
+    #plt.show()
     plt.close()
     
 
-    print(series)
+    #print(series)
     return series
 
 
@@ -124,5 +125,33 @@ def main():
     #expoTester(args.csv_path)
     Tester(args.csv_path)
 
+
+def main2():
+
+    # Liste, um die Pfade aller Dateien mit der Endung 'median.csv' zu speichern
+    median_csv_files = []
+    df = pd.DataFrame(columns=['Dataname', 'lin_intercept','lin_slope','lin_r_value','lin_p_wert','lin_std_err','lin_pearson_corr', \
+                               'expoIntercept', 'expoSlope', 'expo_r_value', 'expo_p_value', 'expo_std_err', 'expo_pearson_corr'])
+    print(df)
+
+
+
+
+    # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
+    for subdir, dirs, files in os.walk("."):
+        for file in files:
+            if file.endswith('median.csv'):
+                median_csv_files.append(os.path.join(subdir, file))
+
+    # Ausgabe der gefundenen Dateien
+    for file_path in median_csv_files:
+        print(file_path)
+        row = Tester(file_path)
+        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+    
+    print(df)
+    df.to_csv("result.csv")
+
+
 if __name__ == "__main__":
-    main()
+    main2()
