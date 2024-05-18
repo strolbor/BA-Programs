@@ -124,7 +124,8 @@ def main():
 def main2():
 
     parser = argparse.ArgumentParser(description='Perform linar/exponential regression on -median.csv data from picker.py.')
-    parser.add_argument('ordner', type=str, help='The path to the folder containing the csv files.r')
+    parser.add_argument('-d', '--dir', type=str, help='The path to the folder containing the csv files.') # Pflichtargument
+    parser.add_argument('-s','--suffix', nargs='?', type=str, help='Den Filterprefix (endswith) ändern', default='median.csv') # Optionales Argument
 
     args = parser.parse_args()
 
