@@ -1,10 +1,11 @@
 import os
-import csv
 import sys
 import time
 import pandas as pd
 
 import matplotlib.pyplot as plt
+
+import argparse
 
 ## Kurzbeschreibung
 
@@ -378,30 +379,23 @@ def mod_FM_all():
 
 
         
-# Beispielaufrufe der Funktionen
+# Aufruffunktion
+
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(f"Funktionsfehler. Usage: {sys.argv[0]} [one-option]")
-        print("-1 für FM all Batch")
-        print("-2 für SAT all Batch")
-        print("-9 für SAT all & FM all Batch")
-        exit()
-    else:
-        start_time = time.time()
-        if int(sys.argv[1]) == 1:
+    parser = argparse.ArgumentParser(description="Auswahl von Optionen für die Batch-Konvertierung.")
+    parser.add_argument("options", type=int, nargs='+', choices=[1, 2], help="1 für geordnet nach Feature Modell, 2 für geordnet nach SAT-Solver")
+
+    args = parser.parse_args()
+
+    start_time = time.time()
+
+    for option in args.options:
+        if option == 1:
             mod_FM_all()
-        elif int(sys.argv[1]) == 2:
-            pass
+        elif option == 2:
             mod_SAT_all()
-        elif int(sys.argv[1]) == 9:
-            mod_FM_all()
-            mod_SAT_all()
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print("Ausführungszeit:", execution_time, "Sekunden")
 
-
-
-       
-
-   
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print("Ausführungszeit:", execution_time, "Sekunden")
+ 
