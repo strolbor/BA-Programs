@@ -6,19 +6,14 @@ import argparse
 from scipy.stats import linregress
 import os
 
-# Daten erstellen
-data = {
-    "Year-DIMACS": [2002, 2003, 2005, 2006, 2004, 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2012, 2013, 2017, 2018, 2016, 2019, 2021, 2022, 2020, 2023, 2024],
-    "dimacs-analyzer-time": [28575826.0, 26733080.0, 45946024.0, 55658457.0, 34892681.0, 75663773.0, 100024789.0, 129064740.0, 138120070.0, 167769804.0, 216313122.0, 251240199.0, 177809116.0, 193798121.0, 319234057.0, 346222497.0, 272316746.0, 394456116.0, 477582431.0, 503941762.0, 417442879.0, 535173892.0, 597433451.0]
-}
-
 def Tester(dateiname):
     """überprüft ob die Daten Linear & exponentiell verteilt sind ist.
-    Mithilfe von Pearson"""
-    print("--- BEIDES ---")
+    Mithilfe von Pearson
+    Für SAT-Solver"""
+    #print("--- BEIDES ---")
 
-    df = pd.DataFrame(data)
-    #df = pd.read_csv(dateiname)
+    #df = pd.DataFrame(data)
+    df = pd.read_csv(dateiname)
 
     # Lineare Regression durchführen
     linX = df[["Year-DIMACS"]]
@@ -33,7 +28,7 @@ def Tester(dateiname):
     
     # andere Werte
     # Perform linear regression
-    linSlope2, linIntercept2, lin_r_value, lin_p_value, lin_std_err = linregress(data['Year-DIMACS'], data['dimacs-analyzer-time'])
+    linSlope2, linIntercept2, lin_r_value, lin_p_value, lin_std_err = linregress(df['Year-DIMACS'], df['dimacs-analyzer-time'])
 
 
 
@@ -70,7 +65,7 @@ def Tester(dateiname):
     # Korrelation berechnen zw. YEAR-Dimacs und Analyse Zeit
     expo_correlation = df[['Year-DIMACS', 'predicted_dimacs-analyzer-time_expo']].corr(method='pearson').iloc[0, 1]
     #print(df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson'))
-    print(f"corr1: r={expo_correlation}")
+    #print(f"corr1: r={expo_correlation}")
 
     expoSlope2, expoIntercept2, expo_r_value, expo_p_value, expo_std_err = linregress(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'])
 
@@ -128,6 +123,11 @@ def main():
 
 def main2():
 
+    parser = argparse.ArgumentParser(description='Perform linar/exponential regression on DIMACS data.')
+    parser.add_argument('ordner', type=str, help='The path to the csv file folder')
+
+    args = parser.parse_args()
+
     # Liste, um die Pfade aller Dateien mit der Endung 'median.csv' zu speichern
     median_csv_files = []
     df = pd.DataFrame(columns=['Dataname', 'lin_intercept','lin_slope','lin_r_value','lin_p_wert','lin_std_err','lin_pearson_corr', \
@@ -138,7 +138,7 @@ def main2():
 
 
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
-    for subdir, dirs, files in os.walk("."):
+    for subdir, dirs, files in os.walk(args.ordner):#"."):
         for file in files:
             if file.endswith('median.csv'):
                 median_csv_files.append(os.path.join(subdir, file))
@@ -149,7 +149,10 @@ def main2():
         row = Tester(file_path)
         df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
     
-    print(df)
+    df['best-fittest'] = df.apply(lambda row: 'Linear' if row['lin_pearson_corr'] > row['expo_pearson_corr'] else 'Exponential', axis=1)
+
+
+    #print(df)
     df.to_csv("result.csv")
 
 
