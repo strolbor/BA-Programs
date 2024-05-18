@@ -144,7 +144,9 @@ def sat_starter():
     
     # Gucken, welcher r-wert Genauer ist.
     # bedeutet höhere WSK (neben den p-werten) das die Nullhypothese falsch ist
-    df['best-fittest'] = df.apply(lambda row: 'Linear' if row['lin_pearson_corr'] > row['expo_pearson_corr'] else 'Exponential', axis=1)
+    #df['best-fittest'] = df.apply(lambda row: 'Linear' if row['lin_pearson_corr'] > row['expo_pearson_corr'] else 'Exponential', axis=1)
+
+    df['best-fittest'] = df.apply(lambda row: 'Linear' if abs(row['lin_pearson_corr']) > abs(row['expo_pearson_corr']) else 'Expo', axis=1)
 
 
     #print(df)
@@ -289,7 +291,11 @@ def fm_starter():
     
     # Gucken, welcher r-wert Genauer ist.
     # bedeutet höhere WSK (neben den p-werten) das die Nullhypothese falsch ist
-    df['best-fittest'] = df.apply(lambda row: 'Linear' if row['lin_pearson_corr'] > row['expo_pearson_corr'] else 'Exponential', axis=1)
+    #df['best-fittest'] = df.apply(lambda row: 'Linear' if row['lin_pearson_corr'] > row['expo_pearson_corr'] else 'Exponential', axis=1)
+
+    df['best-fittest'] = df.apply(lambda row: 'Linear' if abs(row['lin_pearson_corr']) > abs(row['expo_pearson_corr']) else 'Expo', axis=1)
+
+    
 
 
     #print(df)
@@ -320,8 +326,10 @@ def verlauf_starter():
     
     # Gucken, welcher r-wert Genauer ist.
     # bedeutet höhere WSK (neben den p-werten) das die Nullhypothese falsch ist
+    
     df['best-fittest'] = df.apply(lambda row: 'Linear' if row['lin_pearson_corr'] > row['expo_pearson_corr'] else 'Exponential', axis=1)
 
+  
 
     #print(df)
     df.to_csv(os.path.join("sorted_by_verlauf","Regrssion-result.csv"),index=False)
