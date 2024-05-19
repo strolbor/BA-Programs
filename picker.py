@@ -1,11 +1,12 @@
 import os
-import sys
+import numpy as np
 import time
 import pandas as pd
 
 import matplotlib.pyplot as plt
 
 import argparse
+
 
 ## Kurzbeschreibung
 
@@ -157,7 +158,7 @@ def all_save_SAT(df2,filterReader,ordnername):
         plt.xticks(df[plot_x].unique(),rotation=90) 
         #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
         plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
-        plt.title('SAT Solvern Vergleich')  # Titel des Plots festlegen
+        plt.title(f'SAT Solvern Vergleich ({filterReader})')  # Titel des Plots festlegen
 
         # Plot anzeigen
         plt.tight_layout(rect=[0, 0, 0.7, 1])
@@ -213,6 +214,7 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
 
         plt.xlabel('Feature Modell Jahr')
         plt.ylabel('Nanosekunden')
+        print(name)
         plt.title("Geordnet nach Solver: " + name.split("/")[1])
         plt.xticks(df[plot_x].unique(),rotation=90) #
         plt.grid(True)
@@ -244,6 +246,9 @@ def mod_SAT_all():
     # Füge eine neue Spalte 'Year' hinzu, um das Jahr zu speichern
     # kconfigreader/linux/v2.5.45[i386].dimacs
     data['Year-DIMACS'] = data['dimacs-file'].apply(lambda x: get_year(x.split("/")[2].split("[")[0])).astype('int64')
+
+    # Exponenten 
+    data['analyzer_Exponent'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.log10(x))).astype(int)
 
     # Alle Salver auflisten
     df2 = data.groupby('dimacs-analyzer').apply(lambda x: x['dimacs-analyzer'].unique())
@@ -347,13 +352,15 @@ def mod_FM_all():
     # Die Feature Modell dynamisch laden
     data = load_data_from_csv("solve_model-satisfiable/output.csv")
 
-    # TODO: überprüfen
     #  Füge den Solver das Jahr hinzu
     data['Year-SOLVER'] = data['dimacs-analyzer'].apply(lambda x: convert_short_year(x.split("/")[1].split("-")[0]))
 
     # Füge eine neue Spalte 'Year' hinzu, um das Jahr zu speichern
     # kconfigreader/linux/v2.5.45[i386].dimacs
     data['Year-DIMACS'] = data['dimacs-file'].apply(lambda x: get_year(x.split("/")[2].split("[")[0]))
+
+    # Exponenten 
+    data['analyzer_Exponent'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.log10(x))).astype(int)
 
     # Einzelne FM Finden
     df2 = data.groupby('dimacs-file').apply(lambda x: x['dimacs-file'].unique())
