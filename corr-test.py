@@ -23,8 +23,8 @@ def TesterSAT(dateiname : str):
     model.fit(linX, liny)
     
     # Regressionskoeffizienten
-    linIntercept = model.intercept_
-    linSlope = model.coef_[0]
+    linIntercept = model.intercept_[0]
+    linSlope = model.coef_[0][0]
     
     # andere Werte
     # Perform linear regression
@@ -53,8 +53,9 @@ def TesterSAT(dateiname : str):
     model = LinearRegression()
     model.fit(expoX, expoy)
 
-    expoIntercept = model.intercept_
-    expoSlope = model.coef_[0]
+    expoIntercept = model.intercept_[0]
+    expoSlope = model.coef_[0][0]
+
 
     # Vorhersage der transformierten y-Werte (log_y)
     df['predicted_log_dimacs-analyzer-time'] = model.predict(expoX)
@@ -70,17 +71,13 @@ def TesterSAT(dateiname : str):
     expoSlope2, expoIntercept2, expo_r_value, expo_p_value, expo_std_err = linregress(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'])
 
     series = {
-        'Dataname': dateiname,
-        'lin_intercept': linIntercept[0],
-        'lin_slope': linSlope[0],
-        #'lin_r_value': lin_r_value,
+        'Dataname': dateiname.split("/")[1],
+        'lin_formula': f"{linSlope} * x + {linIntercept}",#linIntercept[0],
         'lin_p_wert': lin_p_value,
         'lin_std_err': lin_std_err,
         'lin_pearson_corr': LinCorrelation,
         
-        'expoIntercept': expoIntercept[0],
-        'expoSlope': expoSlope[0],
-        #'expo_r_value': expo_r_value,
+        'expo_formuala': f"{np.exp(expoIntercept)} * e^({expoSlope} * x)",
         'expo_p_value': expo_p_value,
         'expo_std_err':expo_std_err,
         'expo_pearson_corr': expo_correlation
@@ -119,15 +116,17 @@ def TesterSAT(dateiname : str):
     #print(series)
     return series
 
+def initDF():
+    df = pd.DataFrame(columns=['Dataname', 'lin_formula',
+                               'lin_p_wert','lin_std_err','lin_pearson_corr', \
+                               'expo_formula', 
+                               'expo_p_value', 'expo_std_err', 'expo_pearson_corr'])
+    return df
+
 def sat_starter():
     # Liste, um die Pfade aller Dateien mit der Endung 'median.csv' zu speichern
     median_csv_files = []
-    df = pd.DataFrame(columns=['Dataname', 'lin_intercept','lin_slope',
-                               #'lin_r_value',
-                               'lin_p_wert','lin_std_err','lin_pearson_corr', \
-                               'expoIntercept', 'expoSlope', 
-                               #'expo_r_value', 
-                               'expo_p_value', 'expo_std_err', 'expo_pearson_corr'])
+    df = initDF()
 
 
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
@@ -150,6 +149,7 @@ def sat_starter():
 
 
     #print(df)
+    df.sort_values(by='Dataname',inplace=True)
     df.to_csv(os.path.join("sorted_by_SAT","Regrssion-result.csv"),index=False)
 
 
@@ -173,8 +173,8 @@ def TesterFM(dateiname):
     model.fit(linX, liny)
     
     # Regressionskoeffizienten
-    linIntercept = model.intercept_
-    linSlope = model.coef_[0]
+    linIntercept = model.intercept_[0]
+    linSlope = model.coef_[0][0]
     
     # andere Werte
     # Perform linear regression
@@ -220,17 +220,13 @@ def TesterFM(dateiname):
     expoSlope2, expoIntercept2, expo_r_value, expo_p_value, expo_std_err = linregress(df['Year-SOLVER'], df['predicted_dimacs-analyzer-time_expo'])
 
     series = {
-        'Dataname': dateiname,
-        'lin_intercept': linIntercept[0],
-        'lin_slope': linSlope[0],
-        #'lin_r_value': lin_r_value,
+        'Dataname': dateiname.split("/")[1],
+        'lin_formula': f"{linSlope} * x + {linIntercept}",#linIntercept[0],
         'lin_p_wert': lin_p_value,
         'lin_std_err': lin_std_err,
         'lin_pearson_corr': LinCorrelation,
         
-        'expoIntercept': expoIntercept[0],
-        'expoSlope': expoSlope[0],
-        #'expo_r_value': expo_r_value,
+        'expo_formuala': f"{np.exp(expoIntercept)} * e^({expoSlope} * x)",
         'expo_p_value': expo_p_value,
         'expo_std_err':expo_std_err,
         'expo_pearson_corr': expo_correlation
@@ -269,12 +265,7 @@ def TesterFM(dateiname):
 def fm_starter():
     # Liste, um die Pfade aller Dateien mit der Endung 'median.csv' zu speichern
     median_csv_files = []
-    df = pd.DataFrame(columns=['Dataname', 'lin_intercept','lin_slope',
-                               #'lin_r_value',
-                               'lin_p_wert','lin_std_err','lin_pearson_corr', \
-                               'expoIntercept', 'expoSlope', 
-                               #'expo_r_value', 
-                               'expo_p_value', 'expo_std_err', 'expo_pearson_corr'])
+    df = initDF()
 
 
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
@@ -299,17 +290,13 @@ def fm_starter():
 
 
     #print(df)
+    df.sort_values(by='Dataname',inplace=True)
     df.to_csv(os.path.join("sorted_by_FM","Regrssion-result.csv"),index=False)
 
 def verlauf_starter():
     # Liste, um die Pfade aller Dateien mit der Endung 'median.csv' zu speichern
     median_csv_files = []
-    df = pd.DataFrame(columns=['Dataname', 'lin_intercept','lin_slope',
-                               #'lin_r_value',
-                               'lin_p_wert','lin_std_err','lin_pearson_corr', \
-                               'expoIntercept', 'expoSlope', 
-                               #'expo_r_value', 
-                               'expo_p_value', 'expo_std_err', 'expo_pearson_corr'])
+    df = initDF()
 
 
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
@@ -332,6 +319,7 @@ def verlauf_starter():
   
 
     #print(df)
+    df.sort_values(by='Dataname',inplace=True)
     df.to_csv(os.path.join("sorted_by_verlauf","Regrssion-result.csv"),index=False)
 
 
