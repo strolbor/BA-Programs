@@ -245,7 +245,7 @@ def TesterFM(dateiname):
     plt.figure(figsize=(12, 6))
     #plt.scatter(df['Year-SOLVER'], df['dimacs-analyzer-time'], color='blue', label='Actual data')
     #plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', label=str(data['Year-DIMACS'].unique()[0]) + "_" + fmmodel)
-    plt.plot(df['Year-SOLVER'], df['dimacs-analyzer-time'], color='blue', label='Actual data', marker='o', linestyle='-')
+    plt.plot(df['Year-SOLVER'], df['dimacs-analyzer-time'], color='blue', label=f'Feature Modell Jahr: {df["Year-DIMACS"].unique()[0]}', marker='o', linestyle='-')
     plt.plot(df['Year-SOLVER'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
     plt.plot(df['Year-SOLVER'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-linear Regression), Pearson r={expo_correlation:.2f}')
     plt.xlabel('Sat Sover Jahr')

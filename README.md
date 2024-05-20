@@ -45,3 +45,12 @@ aus um Informationen zu den Wachstumgradizent zu erhalten:
 
 - Pandas (persons korrelations quoeffizenten )
   - https://stackoverflow.com/questions/25571882/pandas-columns-correlation-with-statistical-significance
+
+
+## Log minimierer:
+
+```sh
+grep '^[cs]' output.log > tmp && grep -v '^v' output.log >> tmp && mv tmp output.min.log
+
+```
+

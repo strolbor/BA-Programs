@@ -293,7 +293,7 @@ def plot_all_FM(df,name,ReaderStr):
     # Nur für FM
     df.sort_values(by='Year-SOLVER', inplace=True)
 
-    plot_x = 'dimacs-analyzer' # 'dimacs-analyzer'  'Year-SOLVER'
+    plot_x = 'Year-SOLVER' # 'dimacs-analyzer'  'Year-SOLVER'
     plot_y = 'dimacs-analyzer-time'
 
 

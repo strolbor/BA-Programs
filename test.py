@@ -40,7 +40,7 @@ plt.plot(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time'], label='Angepas
 plt.xlabel('Year-DIMACS')
 plt.ylabel('dimacs-analyzer-time')
 plt.legend()
-plt.show()
+#plt.show()
 
 # Exponentielle Funktion anzeigen
 print(f"Exponentielle Funktion: y = {np.exp(expoIntercept)} * e({expoSlope} * x)")
