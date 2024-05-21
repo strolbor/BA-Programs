@@ -3,16 +3,13 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import argparse
-from scipy.stats import linregress
+from scipy.stats import linregress, probplot
 import os
+import glob
 
-def TesterSAT(dateiname : str):
-    """überprüft ob die Daten Linear & exponentiell verteilt sind ist.
-    Mithilfe von Pearson
-    Für SAT-Solver"""
-    #print("--- BEIDES ---")
 
-    #df = pd.DataFrame(data)
+def TesterSAT(dateiname: str):
+    """Überprüft, ob die Daten linear und exponentiell verteilt sind, mithilfe von Pearson für SAT-Solver"""
     df = pd.read_csv(dateiname)
 
     # Lineare Regression durchführen
@@ -22,33 +19,19 @@ def TesterSAT(dateiname : str):
     model = LinearRegression()
     model.fit(linX, liny)
     
-    # Regressionskoeffizienten
     linIntercept = model.intercept_[0]
     linSlope = model.coef_[0][0]
     
-    # andere Werte
-    # Perform linear regression
     linSlope2, linIntercept2, lin_r_value, lin_p_value, lin_std_err = linregress(df['Year-DIMACS'], df['dimacs-analyzer-time'])
 
-
-
-    # Ausgleichsgerade berechnen
     df['predicted'] = model.predict(linX)
-
-    # Korrelation berechnen zw. YEAR-Dimacs und Analyse Zeit
     LinCorrelation = df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson').iloc[0, 1]
-    #print(df[['Year-DIMACS', 'dimacs-analyzer-time','predicted']].corr(method='pearson'))
-
-    #
-    ## EXPO Test
-    # 
 
     # Log-Transformation der abhängigen Variable y
     df['log_dimacs-analyzer-time'] = np.log(df['dimacs-analyzer-time'])
 
-    # Lineares Regressionsmodell erstellen und anpassen
-    expoX = df[["Year-DIMACS"]].values # Unabhängige Variable (muss 2D-Array sein)
-    expoy = df[["log_dimacs-analyzer-time"]].values  # Transformierte abhängige Variable
+    expoX = df[["Year-DIMACS"]].values
+    expoy = df[["log_dimacs-analyzer-time"]].values
 
     model = LinearRegression()
     model.fit(expoX, expoy)
@@ -56,65 +39,56 @@ def TesterSAT(dateiname : str):
     expoIntercept = model.intercept_[0]
     expoSlope = model.coef_[0][0]
 
-
-    # Vorhersage der transformierten y-Werte (log_y)
     df['predicted_log_dimacs-analyzer-time'] = model.predict(expoX)
-
-    # Rücktransformation der vorhergesagten Werte
     df['predicted_dimacs-analyzer-time_expo'] = np.exp(df['predicted_log_dimacs-analyzer-time'])
 
-    # Korrelation berechnen zw. YEAR-Dimacs und Analyse Zeit
     expo_correlation = df[['Year-DIMACS', 'predicted_dimacs-analyzer-time_expo']].corr(method='pearson').iloc[0, 1]
-    #print(df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson'))
-    #print(f"corr1: r={expo_correlation}")
-
     expoSlope2, expoIntercept2, expo_r_value, expo_p_value, expo_std_err = linregress(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'])
 
     series = {
         'Dataname': dateiname.split("/")[1],
-        'lin_formula': f"{linSlope} * x + {linIntercept}",#linIntercept[0],
+        'lin_formula': f"{linSlope} * x + {linIntercept}",
         'lin_p_wert': lin_p_value,
         'lin_std_err': lin_std_err,
         'lin_pearson_corr': LinCorrelation,
         
         'expo_formula': f"{np.exp(expoIntercept)} * e^({expoSlope} * x)",
         'expo_p_value': expo_p_value,
-        'expo_std_err':expo_std_err,
+        'expo_std_err': expo_std_err,
         'expo_pearson_corr': expo_correlation
-                       
     }
 
-
-    #
-    ## Ergebnisse
-    # 
-
-    # Sortieren
     df.sort_values(by='Year-DIMACS', inplace=True)
 
-    # Ergebnisse darstellen
     plt.figure(figsize=(12, 6))
-    #plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], color='blue', label='Actual data')
     plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], color='blue', label='Actual data', marker='o', linestyle='-')
     plt.plot(df['Year-DIMACS'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
     plt.plot(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-linear Regression), Pearson r={expo_correlation:.2f}')
     plt.xlabel('Feature Modell Jahr')
     plt.ylabel('Nanosekunden')
     plt.title(f'Lineare Regression und Korrelationsanalyse ({dateiname.split("/")[1].replace(".csv","")})')
-    plt.xticks(df["Year-DIMACS"].unique(),rotation=90)
-    plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
+    plt.xticks(df["Year-DIMACS"].unique(), rotation=90)
+    plt.grid(True, which="both", ls="--")
     plt.legend()
-
-    if dateiname.endswith('-median.csv'):
-        plt.savefig(dateiname.replace("-median.csv","-regression-test.png"))  # Plot speichern
-    else:
-        plt.savefig(dateiname.replace(".csv","-regression-test.png"))  # Plot speichern
-    #plt.show()
+    plt.savefig(dateiname.replace("-median.csv", "-regression-test.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-regression-test.png"))
     plt.close()
-    
 
-    #print(series)
+    # QQ-Plot für lineare Regression
+    plt.figure(figsize=(12, 6))
+    probplot(df['dimacs-analyzer-time'], dist="norm", plot=plt)
+    plt.title(f'QQ-Plot (Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+    plt.savefig(dateiname.replace("-median.csv", "-qqplot-linear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-linear.png"))
+    plt.close()
+
+    # QQ-Plot für log-lineare Regression
+    plt.figure(figsize=(12, 6))
+    probplot(df['log_dimacs-analyzer-time'], dist="norm", plot=plt)
+    plt.title(f'QQ-Plot (Log-Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+    plt.savefig(dateiname.replace("-median.csv", "-qqplot-loglinear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-loglinear.png"))
+    plt.close()
+
     return series
+
 
 def initDF():
     df = pd.DataFrame(columns=['Dataname', 'lin_formula',
@@ -132,7 +106,7 @@ def sat_starter():
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
     for subdir, dirs, files in os.walk("sorted_by_SAT"):
         for file in files:
-            if file.endswith('median.csv'):
+            if file.endswith('median.csv') and not file.endswith("Regrssion-result.csv"):
                 median_csv_files.append(os.path.join(subdir, file))
 
     # Ausgabe der gefundenen Dateien
@@ -156,13 +130,8 @@ def sat_starter():
 
 
 
-def TesterFM(dateiname):
-    """überprüft ob die Daten Linear & exponentiell verteilt sind ist.
-    Mithilfe von Pearson
-    Für FM-Solver"""
-    #print("--- BEIDES ---")
-
-    #df = pd.DataFrame(data)
+def TesterFM(dateiname: str):
+    """Überprüft, ob die Daten linear und exponentiell verteilt sind, mithilfe von Pearson für FM-Solver"""
     df = pd.read_csv(dateiname)
 
     # Lineare Regression durchführen
@@ -172,33 +141,19 @@ def TesterFM(dateiname):
     model = LinearRegression()
     model.fit(linX, liny)
     
-    # Regressionskoeffizienten
     linIntercept = model.intercept_[0]
     linSlope = model.coef_[0][0]
     
-    # andere Werte
-    # Perform linear regression
     linSlope2, linIntercept2, lin_r_value, lin_p_value, lin_std_err = linregress(df['Year-SOLVER'], df['dimacs-analyzer-time'])
 
-
-
-    # Ausgleichsgerade berechnen
     df['predicted'] = model.predict(linX)
-
-    # Korrelation berechnen zw. YEAR-Dimacs und Analyse Zeit
     LinCorrelation = df[['Year-SOLVER', 'dimacs-analyzer-time']].corr(method='pearson').iloc[0, 1]
-    #print(df[['Year-DIMACS', 'dimacs-analyzer-time','predicted']].corr(method='pearson'))
-
-    #
-    ## EXPO Test
-    # 
 
     # Log-Transformation der abhängigen Variable y
     df['log_dimacs-analyzer-time'] = np.log(df['dimacs-analyzer-time'])
 
-    # Lineares Regressionsmodell erstellen und anpassen
-    expoX = df[["Year-SOLVER"]].values # Unabhängige Variable (muss 2D-Array sein)
-    expoy = df[["log_dimacs-analyzer-time"]].values  # Transformierte abhängige Variable
+    expoX = df[["Year-SOLVER"]].values
+    expoy = df[["log_dimacs-analyzer-time"]].values
 
     model = LinearRegression()
     model.fit(expoX, expoy)
@@ -206,60 +161,55 @@ def TesterFM(dateiname):
     expoIntercept = model.intercept_[0]
     expoSlope = model.coef_[0][0]
 
-    # Vorhersage der transformierten y-Werte (log_y)
     df['predicted_log_dimacs-analyzer-time'] = model.predict(expoX)
-
-    # Rücktransformation der vorhergesagten Werte
     df['predicted_dimacs-analyzer-time_expo'] = np.exp(df['predicted_log_dimacs-analyzer-time'])
 
-    # Korrelation berechnen zw. YEAR-Dimacs und Analyse Zeit
     expo_correlation = df[['Year-SOLVER', 'predicted_dimacs-analyzer-time_expo']].corr(method='pearson').iloc[0, 1]
-    #print(df[['Year-DIMACS', 'dimacs-analyzer-time']].corr(method='pearson'))
-    #print(f"corr1: r={expo_correlation}")
-
     expoSlope2, expoIntercept2, expo_r_value, expo_p_value, expo_std_err = linregress(df['Year-SOLVER'], df['predicted_dimacs-analyzer-time_expo'])
 
     series = {
         'Dataname': dateiname.split("/")[1],
-        'lin_formula': f"{linSlope} * x + {linIntercept}",#linIntercept[0],
+        'lin_formula': f"{linSlope} * x + {linIntercept}",
         'lin_p_wert': lin_p_value,
         'lin_std_err': lin_std_err,
         'lin_pearson_corr': LinCorrelation,
         
         'expo_formula': f"{np.exp(expoIntercept)} * e^({expoSlope} * x)",
         'expo_p_value': expo_p_value,
-        'expo_std_err':expo_std_err,
+        'expo_std_err': expo_std_err,
         'expo_pearson_corr': expo_correlation
-                       
     }
 
-
-    #
-    ## Ergebnisse
-    # 
-
-    # Sortieren
     df.sort_values(by='Year-SOLVER', inplace=True)
 
-    # Ergebnisse darstellen
+    # Regression Test Plot
     plt.figure(figsize=(12, 6))
-    #plt.scatter(df['Year-SOLVER'], df['dimacs-analyzer-time'], color='blue', label='Actual data')
-    #plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', label=str(data['Year-DIMACS'].unique()[0]) + "_" + fmmodel)
-    plt.plot(df['Year-SOLVER'], df['dimacs-analyzer-time'], color='blue', label=f'Feature Modell Jahr: {df["Year-DIMACS"].unique()[0]}', marker='o', linestyle='-')
+    plt.plot(df['Year-SOLVER'], df['dimacs-analyzer-time'], color='blue', label='Actual data', marker='o', linestyle='-')
     plt.plot(df['Year-SOLVER'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
     plt.plot(df['Year-SOLVER'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-linear Regression), Pearson r={expo_correlation:.2f}')
-    plt.xlabel('Sat Sover Jahr')
+    plt.xlabel('Sat Solver Jahr')
     plt.ylabel('Nanosekunden')
     plt.title(f'Lineare Regression und Korrelationsanalyse ({dateiname.split("/")[1].replace(".csv","")})')
-    plt.xticks(df["Year-SOLVER"].unique(),rotation=90)
-    plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
+    plt.xticks(df["Year-SOLVER"].unique(), rotation=90)
+    plt.grid(True, which="both", ls="--")
     plt.legend()
-    plt.savefig(dateiname.replace("-median.csv","-regression-test.png"))  # Plot speichern
-    #plt.show()
+    plt.savefig(dateiname.replace("-median.csv", "-regression-test.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-regression-test.png"))
     plt.close()
-    
 
-    #print(series)
+    # QQ-Plot für lineare Regression
+    plt.figure(figsize=(12, 6))
+    probplot(df['dimacs-analyzer-time'], dist="norm", plot=plt)
+    plt.title(f'QQ-Plot (Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+    plt.savefig(dateiname.replace("-median.csv", "-qqplot-linear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-linear.png"))
+    plt.close()
+
+    # QQ-Plot für log-lineare Regression
+    plt.figure(figsize=(12, 6))
+    probplot(df['log_dimacs-analyzer-time'], dist="norm", plot=plt)
+    plt.title(f'QQ-Plot (Log-Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+    plt.savefig(dateiname.replace("-median.csv", "-qqplot-loglinear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-loglinear.png"))
+    plt.close()
+
     return series
 
 def fm_starter():
@@ -271,7 +221,7 @@ def fm_starter():
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
     for subdir, dirs, files in os.walk("sorted_by_FM"):
         for file in files:
-            if file.endswith('median.csv'):
+            if file.endswith('median.csv') and not file.endswith("Regrssion-result.csv"):
                 median_csv_files.append(os.path.join(subdir, file))
 
     # Ausgabe der gefundenen Dateien
@@ -302,7 +252,7 @@ def verlauf_starter():
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
     for subdir, dirs, files in os.walk("sorted_by_verlauf"):
         for file in files:
-            if file.endswith('.csv'):
+            if file.endswith('.csv') and not file.endswith("Regrssion-result.csv"):
                 median_csv_files.append(os.path.join(subdir, file))
 
     # Ausgabe der gefundenen Dateien
@@ -324,21 +274,51 @@ def verlauf_starter():
 
 
 
+def delete_generated_files_recursive(start_directory: str = '.'):
+    """
+    Löscht alle vom Skript generierten Dateien im angegebenen Verzeichnis und dessen Unterverzeichnissen.
+    
+    Args:
+    start_directory (str): Der Pfad zu dem Startverzeichnis, in dem die Dateien gelöscht werden sollen. Standard ist das aktuelle Verzeichnis.
+    """
+    # Definieren Sie die Endungen der generierten Dateien
+    generated_file_endings = ['-regression-test.png', '-qqplot-linear.png', '-qqplot-loglinear.png','Regrssion-result.csv']
+    
+    # Gehen Sie rekursiv durch alle Unterverzeichnisse
+    for root, dirs, files in os.walk(start_directory):
+        for ending in generated_file_endings:
+            pattern = f'*{ending}'
+            for file_path in glob.glob(os.path.join(root, pattern)):
+                try:
+                    os.remove(file_path)
+                    print(f"Deleted file: {file_path}")
+                except OSError as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
 def main2():
 
     parser = argparse.ArgumentParser(description='Perform linar/exponential regression on -median.csv data from picker.py.')
-    parser.add_argument('-op',"--options", type=int, nargs='+', choices=[1, 2,3 ], help="1 für geordnet nach Feature Modell, 2 für geordnet nach SAT-Solver, 3 für geordnet nach Jahr")
+    parser.add_argument('-op',"--options", type=int, nargs='+', choices=[1, 2,3 ,4], help="1 für geordnet nach Feature Modell, 2 für geordnet nach SAT-Solver, 3 für geordnet nach Jahr")
     #parser.add_argument('-s','--suffix', nargs='?', type=str, help='Den Filterprefix (endswith) ändern', default='median.csv') # Optionales Argument
+    parser.add_argument('-d','--delete',nargs='?', type=bool)
 
     args = parser.parse_args()
+    print(args)
 
-    for option in args.options:
-        if option == 2:
-            sat_starter()
-        if option == 1:
-            fm_starter()
-        if option == 3:
-            verlauf_starter()
+    if args.options is not None:
+        for option in args.options:
+            if option == 2:
+                sat_starter()
+            if option == 1:
+                fm_starter()
+            if option == 3:
+                verlauf_starter()
+            if option == 4:
+                delete_generated_files_recursive()
+    
+    if args.delete is not None:
+        if args.delete:
+            delete_generated_files_recursive()
 
     
 
@@ -347,29 +327,3 @@ if __name__ == "__main__":
     main2()
 
 
-def notizen():
-    """
-    Ein \( P \)-Wert von \( 3.939858388198921 \times 10^{-13} \) (oder \( 3.939858388198921e-13 \)) ist ein extrem kleiner Wert. Dies hat spezifische Implikationen in der Statistik:
-
-### Bedeutung des \( P \)-Werts
-
-1. **Sehr kleine Wahrscheinlichkeit**: Ein \( P \)-Wert von \( 3.939858388198921e-13 \) bedeutet, dass die Wahrscheinlichkeit, dass die beobachtete Beziehung zwischen den Variablen durch Zufall zustande gekommen ist, extrem gering ist. Mit anderen Worten, es gibt fast keinen Zweifel daran, dass die Beziehung, die du beobachtet hast, tatsächlich existiert und nicht das Ergebnis zufälliger Variation ist.
-
-2. **Statistische Signifikanz**: Da dieser \( P \)-Wert weit unter den üblichen Signifikanzniveaus von 0.05 oder 0.01 liegt, kannst du mit sehr hoher Sicherheit sagen, dass die Nullhypothese (die besagt, dass es keine Beziehung gibt) abgelehnt werden kann. Dies deutet darauf hin, dass die Beziehung zwischen den untersuchten Variablen statistisch signifikant ist.
-
-3. **Interpretation**: In praktischen Begriffen bedeutet ein so kleiner \( P \)-Wert, dass es eine sehr starke Evidenz dafür gibt, dass die unabhängige Variable einen echten Einfluss auf die abhängige Variable hat.
-
-### Beispiel
-
-Angenommen, du hast eine lineare Regression durchgeführt und dieser \( P \)-Wert bezieht sich auf die Steigung der Regressionslinie. Ein \( P \)-Wert von \( 3.939858388198921e-13 \) würde dann bedeuten, dass es eine extrem starke Evidenz dafür gibt, dass die unabhängige Variable \( x \) tatsächlich einen Einfluss auf die abhängige Variable \( y \) hat.
-
-### Kontext in der wissenschaftlichen Praxis
-
-- **Hypothesenprüfung**: In der Hypothesenprüfung hilft dir ein so kleiner \( P \)-Wert, die Nullhypothese zu verwerfen. Das bedeutet, dass das Ergebnis deiner Analyse nicht nur durch Zufall zustande gekommen ist.
-- **Vertrauen in die Ergebnisse**: Du kannst mit sehr hoher Sicherheit darauf vertrauen, dass die Beziehung zwischen den Variablen real ist und dass die Effekte, die du beobachtet hast, nicht zufällig sind.
-
-### Zusammenfassung
-
-Ein \( P \)-Wert von \( 3.939858388198921e-13 \) bedeutet, dass die Wahrscheinlichkeit, dass die beobachtete Beziehung zufällig ist, extrem gering ist. Dies deutet auf eine sehr starke statistische Signifikanz hin, was bedeutet, dass die Beziehung zwischen den untersuchten Variablen sehr wahrscheinlich real und nicht zufällig ist. Solch ein kleiner \( P \)-Wert gibt dir also hohe Sicherheit in den Ergebnissen deiner Analyse.
-    """
-    pass
