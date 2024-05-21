@@ -203,8 +203,8 @@ def TesterFM(dateiname):
     model = LinearRegression()
     model.fit(expoX, expoy)
 
-    expoIntercept = model.intercept_
-    expoSlope = model.coef_[0]
+    expoIntercept = model.intercept_[0]
+    expoSlope = model.coef_[0][0]
 
     # Vorhersage der transformierten y-Werte (log_y)
     df['predicted_log_dimacs-analyzer-time'] = model.predict(expoX)
@@ -331,7 +331,6 @@ def main2():
     #parser.add_argument('-s','--suffix', nargs='?', type=str, help='Den Filterprefix (endswith) ändern', default='median.csv') # Optionales Argument
 
     args = parser.parse_args()
-    print(args)
 
     for option in args.options:
         if option == 2:
