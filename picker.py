@@ -250,6 +250,12 @@ def mod_SAT_all():
     # Exponenten 
     data['analyzer_Exponent'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.log10(x))).astype(int)
 
+    # Speicher n der Nanosekunden
+    data['dimacs-analyzer-time_orig'] = data['dimacs-analyzer-time']
+
+    # Zeit in Millisekunden
+    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.divide(x,np.exp(10,6))))
+
     # Alle Salver auflisten
     df2 = data.groupby('dimacs-analyzer').apply(lambda x: x['dimacs-analyzer'].unique())
 
@@ -361,6 +367,13 @@ def mod_FM_all():
 
     # Exponenten 
     data['analyzer_Exponent'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.log10(x))).astype(int)
+
+   
+    # Speicher n der Nanosekunden
+    data['dimacs-analyzer-time_orig'] = data['dimacs-analyzer-time']
+
+    # Zeit in Millisekunden
+    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.divide(x,np.exp(10,6))))
 
     # Einzelne FM Finden
     df2 = data.groupby('dimacs-file').apply(lambda x: x['dimacs-file'].unique())

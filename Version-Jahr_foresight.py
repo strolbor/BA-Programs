@@ -6,7 +6,7 @@ def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-ordnername = "sorted_by_verlauf_mit_vorjahren"
+ordnername = "sorted_by_verlauf_foresight"
 create_folder_if_not_exists(ordnername)
 
 # Lese die Daten aus den CSV-Dateien
@@ -30,7 +30,7 @@ def get_best_solver_times(df):
         df_filtered = df[df['Year-DIMACS'] == year]
         
         # Wir filtern Ergebnisse nach den SOLVER bis zum JAhr x
-        df_filtered = df_filtered[df_filtered['Year-SOLVER'] <= year]
+        #df_filtered = df_filtered[df_filtered['Year-SOLVER'] <= year]
 
         df_filtered.reset_index().sort_values(by='dimacs-analyzer-time')
         
@@ -59,7 +59,7 @@ filtered_kmax.to_csv(os.path.join(ordnername, "Version-Jahr-kmax.csv"), index=Fa
 
 def plotter(df, suffix):
     global ordnername
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 6))
     plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], label='Verlauf', color='blue')
     plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], marker='o')
     plt.xlabel('Jahr')

@@ -29,7 +29,7 @@ filtered_kmax.to_csv(os.path.join(ordnername,"Version-Jahr-kmax.csv"),index=Fals
 
 def plotter(df, suffix):
     global ordnername
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 6))
     plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], label='Verlauf', color='blue')
     plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], marker='o')
     plt.xlabel('Jahr')
