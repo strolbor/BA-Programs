@@ -303,7 +303,6 @@ def main2():
     parser.add_argument('-d','--delete',nargs='?', type=bool)
 
     args = parser.parse_args()
-    print(args)
 
     if args.options is not None:
         for option in args.options:
