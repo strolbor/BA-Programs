@@ -76,14 +76,6 @@ def get_median(df : pd.core.frame.DataFrame,name):
     """Diese Funktion filtert, den Median heraus.
     Tauscht Endung .csv mit -median.csv aus"""
     name = name.replace(".csv","-median.csv")
-    # Alte Variante
-    # df = df.sort_values(by=['dimacs-analyzer','dimacs-file'])
-    # #df = df[df['iteration'] == 3]
-    # # # TODO: nach den mathematischen Median suchen - ohne die Iteration spalte beachten
-    # name = name.replace(".csv","-median.csv")
-
-    # save_csv(df,name)
-    # return df
 
     # DataFrame nach "dimacs-analyzer-time" sortieren
     sorted_df = df.sort_values(by='dimacs-analyzer-time')

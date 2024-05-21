@@ -22,24 +22,11 @@ def get_best_solver_times(df):
     
     # Iteriere über die einzigartigen Jahre der DIMACS-Daten
     for year in df['Year-DIMACS'].unique():
-        # Filtere die Daten bis zum aktuellen Jahr
-        print(year)
-
-
-        # Wir erhalten alle Ergebnisse zu einen FM-Modell
+        # Filtere die Daten bis einschließlich des aktuellen Jahres
         df_filtered = df[df['Year-DIMACS'] == year]
         
-        # Wir filtern Ergebnisse nach den SOLVER bis zum JAhr x
-        #df_filtered = df_filtered[df_filtered['Year-SOLVER'] <= year]
-
-        df_filtered.reset_index().sort_values(by='dimacs-analyzer-time')
-        
-        # Finde die Zeile mit der minimalen Solverzeit
+        # Finde die Zeile mit der minimalen Solverzeit unter den Einträgen bis einschließlich des aktuellen Jahres
         min_time_row = df_filtered.loc[df_filtered['dimacs-analyzer-time'].idxmin()]
-        
-        
-        # Aktualisiere das Jahr des DIMACS mit dem aktuellen Jahr
-        min_time_row['Year-DIMACS'] = year
         
         # Füge diese Zeile der Liste hinzu
         best_times_list.append(min_time_row)

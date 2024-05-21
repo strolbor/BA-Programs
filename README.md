@@ -4,7 +4,7 @@
 
 Führe Torte Experiment durch.
 Und schmecke sie ab (solver_moell_satifiction).
-```sh linux-history-yerarly-v2.sh ```
+```bash bash linux-history-yerarly-v2.sh ```
 
 ## 2 Schritt
 
