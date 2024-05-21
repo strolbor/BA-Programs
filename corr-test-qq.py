@@ -7,6 +7,7 @@ from scipy.stats import linregress, probplot
 import os
 import glob
 
+saveQQ = False
 
 def TesterSAT(dateiname: str):
     """Überprüft, ob die Daten linear und exponentiell verteilt sind, mithilfe von Pearson für SAT-Solver"""
@@ -60,6 +61,7 @@ def TesterSAT(dateiname: str):
 
     df.sort_values(by='Year-DIMACS', inplace=True)
 
+    # Normales Diagramm
     plt.figure(figsize=(12, 6))
     plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], color='blue', label='Actual data', marker='o', linestyle='-')
     plt.plot(df['Year-DIMACS'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
@@ -73,19 +75,20 @@ def TesterSAT(dateiname: str):
     plt.savefig(dateiname.replace("-median.csv", "-regression-test.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-regression-test.png"))
     plt.close()
 
-    # QQ-Plot für lineare Regression
-    plt.figure(figsize=(12, 6))
-    probplot(df['dimacs-analyzer-time'], dist="norm", plot=plt)
-    plt.title(f'QQ-Plot (Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
-    plt.savefig(dateiname.replace("-median.csv", "-qqplot-linear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-linear.png"))
-    plt.close()
+    if saveQQ:
+        # QQ-Plot für lineare Regression
+        plt.figure(figsize=(12, 6))
+        probplot(df['dimacs-analyzer-time'], dist="norm", plot=plt)
+        plt.title(f'QQ-Plot (Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+        plt.savefig(dateiname.replace("-median.csv", "-qqplot-linear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-linear.png"))
+        plt.close()
 
-    # QQ-Plot für log-lineare Regression
-    plt.figure(figsize=(12, 6))
-    probplot(df['log_dimacs-analyzer-time'], dist="norm", plot=plt)
-    plt.title(f'QQ-Plot (Log-Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
-    plt.savefig(dateiname.replace("-median.csv", "-qqplot-loglinear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-loglinear.png"))
-    plt.close()
+        # QQ-Plot für log-lineare Regression
+        plt.figure(figsize=(12, 6))
+        probplot(df['log_dimacs-analyzer-time'], dist="norm", plot=plt)
+        plt.title(f'QQ-Plot (Log-Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+        plt.savefig(dateiname.replace("-median.csv", "-qqplot-loglinear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-loglinear.png"))
+        plt.close()
 
     return series
 
@@ -196,19 +199,21 @@ def TesterFM(dateiname: str):
     plt.savefig(dateiname.replace("-median.csv", "-regression-test.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-regression-test.png"))
     plt.close()
 
-    # QQ-Plot für lineare Regression
-    plt.figure(figsize=(12, 6))
-    probplot(df['dimacs-analyzer-time'], dist="norm", plot=plt)
-    plt.title(f'QQ-Plot (Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
-    plt.savefig(dateiname.replace("-median.csv", "-qqplot-linear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-linear.png"))
-    plt.close()
 
-    # QQ-Plot für log-lineare Regression
-    plt.figure(figsize=(12, 6))
-    probplot(df['log_dimacs-analyzer-time'], dist="norm", plot=plt)
-    plt.title(f'QQ-Plot (Log-Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
-    plt.savefig(dateiname.replace("-median.csv", "-qqplot-loglinear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-loglinear.png"))
-    plt.close()
+    if saveQQ:
+        # QQ-Plot für lineare Regression
+        plt.figure(figsize=(12, 6))
+        probplot(df['dimacs-analyzer-time'], dist="norm", plot=plt)
+        plt.title(f'QQ-Plot (Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+        plt.savefig(dateiname.replace("-median.csv", "-qqplot-linear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-linear.png"))
+        plt.close()
+
+        # QQ-Plot für log-lineare Regression
+        plt.figure(figsize=(12, 6))
+        probplot(df['log_dimacs-analyzer-time'], dist="norm", plot=plt)
+        plt.title(f'QQ-Plot (Log-Linear Regression) ({dateiname.split("/")[1].replace(".csv","")})')
+        plt.savefig(dateiname.replace("-median.csv", "-qqplot-loglinear.png") if dateiname.endswith('-median.csv') else dateiname.replace(".csv", "-qqplot-loglinear.png"))
+        plt.close()
 
     return series
 
@@ -232,7 +237,6 @@ def fm_starter():
     
     # Gucken, welcher r-wert Genauer ist.
     # bedeutet höhere WSK (neben den p-werten) das die Nullhypothese falsch ist
-    #df['best-fittest'] = df.apply(lambda row: 'Linear' if row['lin_pearson_corr'] > row['expo_pearson_corr'] else 'Exponential', axis=1)
 
     df['best-fittest'] = df.apply(lambda row: 'Linear' if abs(row['lin_pearson_corr']) > abs(row['expo_pearson_corr']) else 'Expo', axis=1)
 
@@ -251,6 +255,12 @@ def verlauf_starter():
 
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
     for subdir, dirs, files in os.walk("sorted_by_verlauf"):
+        for file in files:
+            if file.endswith('.csv') and not file.endswith("Regrssion-result.csv"):
+                median_csv_files.append(os.path.join(subdir, file))
+    
+    # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
+    for subdir, dirs, files in os.walk("sorted_by_verlauf_mit_vorjahren"):
         for file in files:
             if file.endswith('.csv') and not file.endswith("Regrssion-result.csv"):
                 median_csv_files.append(os.path.join(subdir, file))
@@ -301,8 +311,14 @@ def main2():
     parser.add_argument('-op',"--options", type=int, nargs='+', choices=[1, 2,3 ,4], help="1 für geordnet nach Feature Modell, 2 für geordnet nach SAT-Solver, 3 für geordnet nach Jahr")
     #parser.add_argument('-s','--suffix', nargs='?', type=str, help='Den Filterprefix (endswith) ändern', default='median.csv') # Optionales Argument
     parser.add_argument('-d','--delete',nargs='?', type=bool)
+    parser.add_argument('-qq','--qqplot',nargs='?', type=bool)
 
     args = parser.parse_args()
+    print(args)
+
+    if args.qqplot is not None:
+        global saveQQ
+        saveQQ = True
 
     if args.options is not None:
         for option in args.options:

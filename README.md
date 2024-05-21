@@ -8,14 +8,14 @@ Und schmecke sie ab (solver_moell_satifiction).
 
 ## 2 Schritt
 
-Führe meinen ```sh python3 picker.py``` aus, um die Daten nach:
+Führe meinen ```sh python3 picker.py 1 2``` aus, um die Daten nach:
 - median
 zu filtern.
 Und erstelle dabei die Plots für:
 - alle Graphen
     - geordnet nach
-        - Feature Modell (FM)
-        - SAT-Solver (SAT)
+        - Feature Modell (FM) (op 1)
+        - SAT-Solver (SAT) (op 2)
 - einzelne Graphen
     - Feature Modell (FM)
     - SAT-Solver (SAT)
@@ -24,7 +24,7 @@ zu erhalten.
 ## 3 Schritt
 
 Führe: 
-- ```sh python3 tenPlotterSAT.py && python3 tenPlotterFM.py && python3 Version-Jahr.py ```
+- ```sh python3 tenPlotterSAT.py && python3 tenPlotterFM.py && python3 Version-Jahr.py && python3 Version-Jahr_mit_vorjahren.py ```
 um weitere Plots zu den SAT & FM zu erhalten:
 - 10-Plots 
     - FM
@@ -35,7 +35,7 @@ um weitere Plots zu den SAT & FM zu erhalten:
 ## 4 Schritt
 
 Führe: 
-```sh corr-test.py``` 
+```sh python3 corr-test-qq.py``` 
 aus um Informationen zu den Wachstumgradizent zu erhalten:
 - Lineare Regression
 - log-lineare Regression (um exponentielles Wachstum nachzu weisen).
