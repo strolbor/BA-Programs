@@ -102,7 +102,7 @@ MODUS_SAT = 2
 def all_save_SAT(df2,filterReader,ordnername):
     """Diese Funktion plottet alle Diagramme in einem.
     x-Achse: Feature Modell
-    y-achse: Nanosekunden
+    y-achse: Millisekunden
     Slave-Fkt zu all_save_SAT"""
     datei_mod = os.path.join(ordnername, "sat-all"+ f"-{filterReader}.csv")
     df2 = df2[df2['dimacs-file'].str.contains(filterReader)]
@@ -146,7 +146,7 @@ def all_save_SAT(df2,filterReader,ordnername):
 
         # Achsenbeschriftungen festlegen
         plt.xlabel('Feature Modell Jahr')
-        plt.ylabel('Nanosekunden')
+        plt.ylabel('Millisekunden')
         plt.xticks(df[plot_x].unique(),rotation=90) 
         #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
         plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
@@ -161,7 +161,7 @@ def all_save_SAT(df2,filterReader,ordnername):
 def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
     """Diese Funktion plottet einzelne Diagramme.
     x-Achse: Feature Modell Jahr
-    y-achse: Nanosekunden"""
+    y-achse: Millisekunden"""
     df2 = df2[df2['dimacs-file'].str.contains(filterReader) & (df2['dimacs-analyzer'] == filterVersion)]
     # sat-competition/07-RSat
     datei_mod = os.path.join(ordnername, filterVersion.split("/")[1]+ f"-{filterReader}.csv")
@@ -205,8 +205,7 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
 
 
         plt.xlabel('Feature Modell Jahr')
-        plt.ylabel('Nanosekunden')
-        print(name)
+        plt.ylabel('Millisekunden')
         plt.title("Geordnet nach Solver: " + name.split("/")[1])
         plt.xticks(df[plot_x].unique(),rotation=90) #
         plt.grid(True)
@@ -242,11 +241,11 @@ def mod_SAT_all():
     # Exponenten 
     data['analyzer_Exponent'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.log10(x))).astype(int)
 
-    # Speicher n der Nanosekunden
+    # Speicher n der Millisekunden
     data['dimacs-analyzer-time_orig'] = data['dimacs-analyzer-time']
 
     # Zeit in Millisekunden
-    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.divide(x,np.exp(10,6))))
+    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.divide(x,1000000))
 
     # Alle Salver auflisten
     df2 = data.groupby('dimacs-analyzer').apply(lambda x: x['dimacs-analyzer'].unique())
@@ -301,7 +300,7 @@ def plot_all_FM(df,name,ReaderStr):
 
     # Achsenbeschriftungen festlegen
     plt.xlabel('Solver')
-    plt.ylabel('Nanosekunden')
+    plt.ylabel('Millisekunden')
     plt.xticks(df[plot_x].unique(),rotation=90) 
 
     #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
@@ -361,11 +360,11 @@ def mod_FM_all():
     data['analyzer_Exponent'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.log10(x))).astype(int)
 
    
-    # Speicher n der Nanosekunden
+    # Speicher n der Millisekunden
     data['dimacs-analyzer-time_orig'] = data['dimacs-analyzer-time']
 
     # Zeit in Millisekunden
-    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.floor(np.divide(x,np.exp(10,6))))
+    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.divide(x,1000000))
 
     # Einzelne FM Finden
     df2 = data.groupby('dimacs-file').apply(lambda x: x['dimacs-file'].unique())

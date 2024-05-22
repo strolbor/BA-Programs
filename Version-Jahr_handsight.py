@@ -57,18 +57,49 @@ filtered_kconfig = get_best_solver_times(sat_kconfigreader)
 filtered_kconfig.to_csv(os.path.join(ordnername, "Version-Jahr-kconfig.csv"), index=False)
 filtered_kmax.to_csv(os.path.join(ordnername, "Version-Jahr-kmax.csv"), index=False)
 
+# def plotter(df, suffix):
+#     global ordnername
+#     plt.figure(figsize=(10, 6))
+#     solvers = df['dimacs-analyzer'].unique()
+#     colors = plt.cm.get_cmap('tab20', len(solvers))
+#     color_map = {solver: colors(i) for i, solver in enumerate(solvers)}
+    
+#     for solver in solvers:
+#         solver_df = df[df['dimacs-analyzer'] == solver]
+#         plt.plot(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], marker='o', label=solver, color=color_map[solver])
+    
+#     plt.xlabel('Jahr')
+#     plt.ylabel('Millisekunden')
+#     plt.title('Zeit vs. FM & Solver aus dem besten Vor- und Nachjahr')
+#     plt.xticks(df['Year-DIMACS'].unique(), rotation=90)  # This ensures all unique years are marked on the x-axis
+#     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
+#     plt.grid(True)
+#     plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
+
 def plotter(df, suffix):
     global ordnername
-    plt.figure(figsize=(12, 6))
-    plt.scatter(df['Year-DIMACS'], df['dimacs-analyzer-time'], label='Verlauf', color='blue')
-    plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], marker='o')
+    plt.figure(figsize=(10, 6))
+    solvers = df['dimacs-analyzer'].unique()
+    colors = plt.cm.get_cmap('tab20', len(solvers))
+    color_map = {solver: colors(i) for i, solver in enumerate(solvers)}
+    
+    # Zeichne die durchgehende Linie
+    plt.plot(df['Year-DIMACS'], df['dimacs-analyzer-time'], color='black', linewidth=0.5, linestyle='-', zorder=1)
+    
+    # Zeichne die Punkte in verschiedenen Farben
+    for solver in solvers:
+        solver_df = df[df['dimacs-analyzer'] == solver]
+        plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=solver, color=color_map[solver], zorder=2)
+    
     plt.xlabel('Jahr')
-    plt.ylabel('Nanosekunden')
-    plt.title('Zeit vs. FM & Solver aus dem besten Vorjahr')
+    plt.ylabel('Millisekunden')
+    plt.title('Zeit vs. FM & Solver aus dem besten Nachjahr')
     plt.xticks(df['Year-DIMACS'].unique(), rotation=90)  # This ensures all unique years are marked on the x-axis
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
     plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
+
+
 
 plotter(filtered_kmax, "kmax")
 plotter(filtered_kconfig, "kconfig")
