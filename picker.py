@@ -14,6 +14,8 @@ import argparse
 # Dieses Python-Skript extrahiert und sortiert Daten aus CSV-Dateien nach SAT-Solvern und Feature-Modellen. 
 # Es können auch 1 Bulk-Aktion durchgeführt, um alle Daten zu sammeln und zu schreiben.
 
+remove2024_dimacs = False
+remove2023_solver = False
 
 linux_versions = {
     'v2.5.45': '2002',
@@ -230,7 +232,6 @@ def mod_SAT_all():
     # Die Feature Modell dynamisch laden
     data = load_data_from_csv("solve_model-satisfiable/output.csv")
 
-    # TODO: überprüfen
     #  Füge den Solver das Jahr hinzu                                                                           #.astype('int64')
     data['Year-SOLVER'] = data['dimacs-analyzer'].apply(lambda x: convert_short_year(x.split("/")[1].split("-")[0])).astype('int64')
 
@@ -249,6 +250,14 @@ def mod_SAT_all():
 
     # Alle Salver auflisten
     df2 = data.groupby('dimacs-analyzer').apply(lambda x: x['dimacs-analyzer'].unique())
+
+    # Remove FM des Jahres 2024
+    if remove2024_dimacs:
+        data = data[data['Year-DIMACS'] != 2024]
+    
+    # Remove SAT des Jahres 2023
+    if remove2023_solver:
+        data = data[data['Year-SOLVER'] != 2023]
 
     zahler = 0
 
@@ -366,6 +375,14 @@ def mod_FM_all():
     # Zeit in Millisekunden
     data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.divide(x,1000000))
 
+    # FM Modell zu 2024 entfernen
+    if remove2024_dimacs:
+        data = data[data['Year-DIMACS'] != 2024]
+    
+    # Remove SAT des Jahres 2023
+    if remove2023_solver:
+        data = data[data['Year-SOLVER'] != 2023]
+
     # Einzelne FM Finden
     df2 = data.groupby('dimacs-file').apply(lambda x: x['dimacs-file'].unique())
     # plot_all_FM
@@ -395,16 +412,28 @@ def mod_FM_all():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Auswahl von Optionen für die Batch-Konvertierung.")
     parser.add_argument("options", type=int, nargs='+', choices=[1, 2], help="1 für geordnet nach Feature Modell, 2 für geordnet nach SAT-Solver")
+    parser.add_argument("-rm2024",nargs='?', type=int,help="Soll das FM des Jahr 2024 entfernt werden? True (1) or False (0)")
+    parser.add_argument("-rm2023",nargs='?', type=int,help="Soll das SAT-Solver des Jahr 2023 entfernt werden? True (1) or False (0)")
 
     args = parser.parse_args()
 
     start_time = time.time()
 
-    for option in args.options:
-        if option == 1:
-            mod_FM_all()
-        elif option == 2:
-            mod_SAT_all()
+    if args.rm2024 is not None:
+        if args.rm2024 == 1:
+            remove2024_dimacs = True
+    
+    if args.rm2023 is not None:
+        if args.rm2023 == 1:
+            remove2023_solver = True
+
+
+    if args.options is not None:
+        for option in args.options:
+            if option == 1:
+                mod_FM_all()
+            elif option == 2:
+                mod_SAT_all()
 
     end_time = time.time()
     execution_time = end_time - start_time

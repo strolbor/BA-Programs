@@ -53,7 +53,7 @@ def tenPlot(dateiReadName,prefix):
 
         # Diagrammformatierung
         plt.xlabel('Feature Modell Jahr')
-        plt.ylabel('Nanosekunden')
+        plt.ylabel('Millisekunden')
         plt.title(f'Zeit für SAT-Solver ({prefix})')
         plt.xticks(df[plot_x].unique(),rotation=90) 
         plt.grid(True)
@@ -68,5 +68,6 @@ def tenPlot(dateiReadName,prefix):
 
 
 if __name__ == '__main__':
+    print("FM Plotter")
     tenPlot("sorted_by_FM/fm-all-kconfigreader-median.csv",'kconfig')
     tenPlot("sorted_by_FM/fm-all-kmax-median.csv",'kmax')

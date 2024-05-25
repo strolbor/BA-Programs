@@ -67,6 +67,7 @@ def plotter(df, suffix):
     plt.grid(True)
     plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
 
-
-plotter(filtered_kmax, "kmax")
-plotter(filtered_kconfig, "kconfig")
+if __name__ == '__main__':
+    print("Foresight")
+    plotter(filtered_kmax, "kmax")
+    plotter(filtered_kconfig, "kconfig")

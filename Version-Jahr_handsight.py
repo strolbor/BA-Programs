@@ -100,6 +100,7 @@ def plotter(df, suffix):
     plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
 
 
-
-plotter(filtered_kmax, "kmax")
-plotter(filtered_kconfig, "kconfig")
+if __name__ == '__main__':
+    print("Handsight")
+    plotter(filtered_kmax, "kmax")
+    plotter(filtered_kconfig, "kconfig")

@@ -8,7 +8,7 @@ Und schmecke sie ab (solver_moell_satifiction).
 
 ## 2 Schritt
 
-Führe meinen ```sh python3 picker.py 1 2``` aus, um die Daten nach:
+Führe meinen ```sh python3 picker.py -rm2024 1 1 2``` aus, um die Daten nach:
 - median
 zu filtern.
 Und erstelle dabei die Plots für:
@@ -24,7 +24,16 @@ zu erhalten.
 ## 3 Schritt
 
 Führe: 
-- ```sh python3 tenPlotterSAT.py && python3 tenPlotterFM.py && python3 Version-Jahr.py && python3 Version-Jahr_mit_vorjahren.py ```
+- 
+```sh 
+
+python3 tenPlotterSAT.py && \ 
+python3 tenPlotterFM.py && \
+python3 Version-Jahr_punktpunkt.py &&\
+python3 Version-Jahr_handsight.py && \
+python3 Version-Jahr_foresight.py 
+
+```
 um weitere Plots zu den SAT & FM zu erhalten:
 - 10-Plots 
     - FM
@@ -35,7 +44,7 @@ um weitere Plots zu den SAT & FM zu erhalten:
 ## 4 Schritt
 
 Führe: 
-```sh python3 corr-test-qq.py``` 
+```sh python3 corr-test-qq.py -op 1 2 3``` 
 aus um Informationen zu den Wachstumgradizent zu erhalten:
 - Lineare Regression
 - log-lineare Regression (um exponentielles Wachstum nachzu weisen).

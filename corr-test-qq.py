@@ -248,22 +248,22 @@ def fm_starter():
     df.to_csv(os.path.join("sorted_by_FM","Regrssion-result.csv"),index=False)
 
 def verlauf_starter():
+    verlauf_starter_2("sorted_by_verlauf")
+    verlauf_starter_2("sorted_by_verlauf_foresight")
+    verlauf_starter_2("sorted_by_verlauf_handsight")
+
+def verlauf_starter_2(ordnerpath):
     # Liste, um die Pfade aller Dateien mit der Endung 'median.csv' zu speichern
     median_csv_files = []
     df = initDF()
 
 
     # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
-    for subdir, dirs, files in os.walk("sorted_by_verlauf"):
+    for subdir, dirs, files in os.walk(ordnerpath):
         for file in files:
             if file.endswith('.csv') and not file.endswith("Regrssion-result.csv"):
                 median_csv_files.append(os.path.join(subdir, file))
     
-    # Durchlaufe das Verzeichnis und alle Unterverzeichnisse
-    for subdir, dirs, files in os.walk("sorted_by_verlauf_mit_vorjahren"):
-        for file in files:
-            if file.endswith('.csv') and not file.endswith("Regrssion-result.csv"):
-                median_csv_files.append(os.path.join(subdir, file))
 
     # Ausgabe der gefundenen Dateien
     for file_path in median_csv_files:
@@ -280,7 +280,7 @@ def verlauf_starter():
 
     #print(df)
     df.sort_values(by='Dataname',inplace=True)
-    df.to_csv(os.path.join("sorted_by_verlauf","Regrssion-result.csv"),index=False)
+    df.to_csv(os.path.join(ordnerpath,"Regrssion-result.csv"),index=False)
 
 
 
