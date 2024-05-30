@@ -99,7 +99,7 @@ def TesterSAT(dateiname : str):
     plt.plot(df['Year-DIMACS'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
     plt.plot(df['Year-DIMACS'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-linear Regression), Pearson r={expo_correlation:.2f}')
     plt.xlabel('Feature Modell Jahr')
-    plt.ylabel('Nanosekunden')
+    plt.ylabel('Millisekunden')
     plt.title(f'Lineare Regression und Korrelationsanalyse ({dateiname.split("/")[1].replace(".csv","")})')
     plt.xticks(df["Year-DIMACS"].unique(),rotation=90)
     plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
@@ -249,7 +249,7 @@ def TesterFM(dateiname):
     plt.plot(df['Year-SOLVER'], df['predicted'], color='red', label=f'Fit line (Linear Regression), Pearson r={LinCorrelation:.2f}')
     plt.plot(df['Year-SOLVER'], df['predicted_dimacs-analyzer-time_expo'], color='green', label=f'Fit line (log-linear Regression), Pearson r={expo_correlation:.2f}')
     plt.xlabel('Sat Sover Jahr')
-    plt.ylabel('Nanosekunden')
+    plt.ylabel('Millisekunden')
     plt.title(f'Lineare Regression und Korrelationsanalyse ({dateiname.split("/")[1].replace(".csv","")})')
     plt.xticks(df["Year-SOLVER"].unique(),rotation=90)
     plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
