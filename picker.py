@@ -153,6 +153,7 @@ def all_save_SAT(df2,filterReader,ordnername):
         #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
         plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
         plt.title(f'SAT Solvern Vergleich ({filterReader})')  # Titel des Plots festlegen
+        #plt.title("Geordnet nach Solver: " + name.split("/")[1])
 
         # Plot anzeigen
         plt.tight_layout(rect=[0, 0, 0.7, 1])
@@ -208,7 +209,7 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
 
         plt.xlabel('Feature Modell Jahr')
         plt.ylabel('Millisekunden')
-        plt.title("Geordnet nach Solver: " + name.split("/")[1])
+        plt.title("Solver: " + name.split("/")[1].split(".")[0])
         plt.xticks(df[plot_x].unique(),rotation=90) #
         plt.grid(True)
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Solver")
@@ -302,10 +303,13 @@ def plot_all_FM(df,name,ReaderStr):
     plot_x = 'Year-SOLVER' # 'dimacs-analyzer'  'Year-SOLVER'
     plot_y = 'dimacs-analyzer-time'
 
-
+    i = 0
+    tmp = ""
     # Durch jeden SAT-Solver iterieren und Daten plotten
     for fmmodel, data in df.groupby('dimacs-file'):
         plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', label=str(data['Year-DIMACS'].unique()[0]) + "_" + fmmodel)
+        i +=1
+        tmp = str(data['Year-DIMACS'].unique()[0])
 
     # Achsenbeschriftungen festlegen
     plt.xlabel('Solver')
@@ -315,6 +319,8 @@ def plot_all_FM(df,name,ReaderStr):
     #plt.yscale('log')  # Logarithmische Skala für die y-Achse verwenden
     plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
     plt.title(f'Feature Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
+    if i == 1:
+        plt.title(f"Feature Modell aus Jahr: {tmp}")
 
     # Plot anzeigen
     plt.tight_layout(rect=[0, 0, 0.7, 1])
