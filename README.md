@@ -4,11 +4,21 @@
 
 Führe Torte Experiment durch.
 Und schmecke sie ab (solver_moell_satifiction).
-```bash bash linux-history-yerarly-v2.sh ```
+
+```bash 
+bash linux-history-yerarly-v2.sh 
+
+```
 
 ## 2 Schritt
 
-Führe meinen ```sh python3 picker.py -rm2024 1 1 2``` aus, um die Daten nach:
+Führe meinen 
+
+```sh 
+python3 picker.py -rm2024 1 1 2
+
+``` 
+aus, um die Daten nach:
 - median
 zu filtern.
 Und erstelle dabei die Plots für:
@@ -24,7 +34,7 @@ zu erhalten.
 ## 3 Schritt
 
 Führe: 
-- 
+
 ```sh 
 
 python3 tenPlotterSAT.py && \ 
@@ -34,6 +44,7 @@ python3 Version-Jahr_handsight.py && \
 python3 Version-Jahr_foresight.py 
 
 ```
+
 um weitere Plots zu den SAT & FM zu erhalten:
 - 10-Plots 
     - FM
@@ -44,7 +55,12 @@ um weitere Plots zu den SAT & FM zu erhalten:
 ## 4 Schritt
 
 Führe: 
-```sh python3 corr-test-qq.py -op 1 2 3``` 
+
+```sh 
+python3 corr-test-qq.py -op 1 2 3
+``` 
+
+
 aus um Informationen zu den Wachstumgradizent zu erhalten:
 - Lineare Regression
 - log-lineare Regression (um exponentielles Wachstum nachzu weisen).
