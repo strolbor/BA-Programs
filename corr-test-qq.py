@@ -128,6 +128,7 @@ def sat_starter():
     #print(df)
     df.sort_values(by='Dataname',inplace=True)
     df.to_csv(os.path.join("sorted_by_SAT","Regrssion-result.csv"),index=False)
+    df.to_latex(os.path.join("sorted_by_SAT","Regrssion-result.tex"),index=False)
 
 
 
@@ -246,6 +247,7 @@ def fm_starter():
     #print(df)
     df.sort_values(by='Dataname',inplace=True)
     df.to_csv(os.path.join("sorted_by_FM","Regrssion-result.csv"),index=False)
+    df.to_latex(os.path.join("sorted_by_FM","Regrssion-result.tex"),index=False)
 
 def verlauf_starter():
     verlauf_starter_2("sorted_by_verlauf")
@@ -281,6 +283,7 @@ def verlauf_starter_2(ordnerpath):
     #print(df)
     df.sort_values(by='Dataname',inplace=True)
     df.to_csv(os.path.join(ordnerpath,"Regrssion-result.csv"),index=False)
+    df.to_latex(os.path.join(ordnerpath,"Regrssion-result.tex"),index=False)
 
 
 
