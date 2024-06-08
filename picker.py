@@ -425,6 +425,7 @@ if __name__ == "__main__":
     parser.add_argument("options", type=int, nargs='+', choices=[1, 2], help="1 für geordnet nach Feature Modell, 2 für geordnet nach SAT-Solver")
     parser.add_argument("-rm2024",nargs='?', type=int,help="Soll das FM des Jahr 2024 entfernt werden? True (1) or False (0)")
     parser.add_argument("-rm2023",nargs='?', type=int,help="Soll das SAT-Solver des Jahr 2023 entfernt werden? True (1) or False (0)")
+    parser.add_argument("-logscale",nargs='?', type=int,help="Soll die Y-Achse der Diagramm log-scaled sein? True (1) or False (0)")
 
     args = parser.parse_args()
 
@@ -437,6 +438,10 @@ if __name__ == "__main__":
     if args.rm2023 is not None:
         if args.rm2023 == 1:
             remove2023_solver = True
+    
+    if args.logscale is not None:
+        if args.logscale == 1:
+            logScale = True
 
 
     if args.options is not None:
