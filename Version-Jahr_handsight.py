@@ -2,6 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+
+logScale = True
+
+
 def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
@@ -57,24 +61,6 @@ filtered_kconfig = get_best_solver_times(sat_kconfigreader)
 filtered_kconfig.to_csv(os.path.join(ordnername, "Version-Jahr-kconfig.csv"), index=False)
 filtered_kmax.to_csv(os.path.join(ordnername, "Version-Jahr-kmax.csv"), index=False)
 
-# def plotter(df, suffix):
-#     global ordnername
-#     plt.figure(figsize=(10, 6))
-#     solvers = df['dimacs-analyzer'].unique()
-#     colors = plt.cm.get_cmap('tab20', len(solvers))
-#     color_map = {solver: colors(i) for i, solver in enumerate(solvers)}
-    
-#     for solver in solvers:
-#         solver_df = df[df['dimacs-analyzer'] == solver]
-#         plt.plot(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], marker='o', label=solver, color=color_map[solver])
-    
-#     plt.xlabel('Jahr')
-#     plt.ylabel('Millisekunden')
-#     plt.title('Zeit vs. FM & Solver aus dem besten Vor- und Nachjahr')
-#     plt.xticks(df['Year-DIMACS'].unique(), rotation=90)  # This ensures all unique years are marked on the x-axis
-#     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
-#     plt.grid(True)
-#     plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
 
 def plotter(df, suffix):
     global ordnername
@@ -93,6 +79,9 @@ def plotter(df, suffix):
     
     plt.xlabel('Jahr')
     plt.ylabel('Millisekunden')
+    if logScale:
+        plt.yscale('log')
+        plt.ylabel('Millisekunden (log-scaled)')
     plt.title('Zeit vs. FM & Solver aus dem besten Nachjahr')
     plt.xticks(df['Year-DIMACS'].unique(), rotation=90)  # This ensures all unique years are marked on the x-axis
     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))

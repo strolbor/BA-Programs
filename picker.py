@@ -147,11 +147,13 @@ def all_save_SAT(df2,filterReader,ordnername):
             plt.plot(data[plot_x], data[plot_y], label=solver, color=colors[i % len(colors)], marker='o', linestyle='-')
             #plt.plot(data['Year-DIMACS'], data['dimacs-analyzer-time'], label=solver, color=colors[i % len(colors)], marker='o', linestyle='-')
 
+        
+        plt.xlabel('Feature Modell Jahr')
+        plt.ylabel('Millisekunden')
         # Achsenbeschriftungen festlegen
         if logScale:
             plt.yscale('log')
-        plt.xlabel('Feature Modell Jahr')
-        plt.ylabel('Millisekunden')
+            plt.ylabel('Millisekunden (log-scaled)')
         plt.xticks(df[plot_x].unique(),rotation=90) 
         plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
         plt.title(f'SAT Solvern Vergleich ({filterReader})')  # Titel des Plots festlegen
@@ -213,6 +215,7 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
         plt.ylabel('Millisekunden')
         if logScale:
             plt.yscale('log')
+            plt.ylabel('Millisekunden (log-scaled)')
         plt.title("Solver: " + name.split("/")[1].split(".")[0])
         plt.xticks(df[plot_x].unique(),rotation=90) #
         plt.grid(True)
@@ -321,6 +324,7 @@ def plot_all_FM(df,name,ReaderStr):
     plt.xticks(df[plot_x].unique(),rotation=90) 
     if logScale:
         plt.yscale('log')
+        plt.ylabel('Millisekunden (log-scaled)')
 
     plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
     plt.title(f'Feature Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
