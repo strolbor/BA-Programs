@@ -120,3 +120,9 @@ git log -p
 ```
 
 Das, wenn man jedemanden leiden lassen will.
+
+## Beispiel für ein nützliches, detailliertes Log:
+
+```sh
+git log --graph --pretty=format:'%h - %an, %ar : %s' --stat
+```
