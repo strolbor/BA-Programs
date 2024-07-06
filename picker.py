@@ -16,7 +16,7 @@ import argparse
 
 remove2024_dimacs = False
 remove2023_solver = False
-logScale = False
+logScale = True
 
 linux_versions = {
     'v2.5.45': '2002',
@@ -148,14 +148,14 @@ def all_save_SAT(df2,filterReader,ordnername):
             #plt.plot(data['Year-DIMACS'], data['dimacs-analyzer-time'], label=solver, color=colors[i % len(colors)], marker='o', linestyle='-')
 
         
-        plt.xlabel('Feature Modell Jahr')
+        plt.xlabel('Feature-Modell Jahr')
         plt.ylabel('Millisekunden')
         # Achsenbeschriftungen festlegen
         if logScale:
             plt.yscale('log')
             plt.ylabel('Millisekunden (log-scaled)')
         plt.xticks(df[plot_x].unique(),rotation=90) 
-        plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
+        plt.grid(True, which="both", ls="---")  # Gitterlinien anzeigen
         plt.title(f'SAT Solvern Vergleich ({filterReader})')  # Titel des Plots festlegen
         #plt.title("Geordnet nach Solver: " + name.split("/")[1])
 
@@ -211,7 +211,7 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
             plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', label=solver)
 
 
-        plt.xlabel('Feature Modell Jahr')
+        plt.xlabel('Feature-Modell Jahr')
         plt.ylabel('Millisekunden')
         if logScale:
             plt.yscale('log')
@@ -314,19 +314,19 @@ def plot_all_FM(df,name,ReaderStr):
     tmp = ""
     # Durch jeden SAT-Solver iterieren und Daten plotten
     for fmmodel, data in df.groupby('dimacs-file'):
-        plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', label=str(data['Year-DIMACS'].unique()[0]) + "_" + fmmodel)
+        plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', label=str(data['Year-DIMACS'].unique()[0]))# + "_" + fmmodel)
         i +=1
         tmp = str(data['Year-DIMACS'].unique()[0])
 
     # Achsenbeschriftungen festlegen
-    plt.xlabel('Solver')
+    plt.xlabel('SAT-Solver')
     plt.ylabel('Millisekunden')
     plt.xticks(df[plot_x].unique(),rotation=90) 
     if logScale:
         plt.yscale('log')
         plt.ylabel('Millisekunden (log-scaled)')
 
-    plt.grid(True, which="both", ls="--")  # Gitterlinien anzeigen
+    plt.grid(True, which="both", ls="---")  # Gitterlinien anzeigen
     plt.title(f'Feature Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
     if i == 1:
         plt.title(f"Feature Modell aus Jahr: {tmp}")
