@@ -17,6 +17,10 @@ import argparse
 remove2024_dimacs = False
 remove2023_solver = False
 logScale = True
+secDiv = 1000000000 # Sekunden
+# secDiv = 1000000  # Milliskekunden
+ylabelGLOD= "Sekunden"
+
 
 linux_versions = {
     'v2.5.45': '2002',
@@ -43,6 +47,8 @@ linux_versions = {
     'v6.2': '2023',
     'v6.7': '2024'
 }
+
+modusGRID = "-"
 
 def convert_short_year(short_year):
     # Annahme: short_year ist ein String
@@ -104,7 +110,7 @@ MODUS_SAT = 2
 # SAT  
 def all_save_SAT(df2,filterReader,ordnername):
     """Diese Funktion plottet alle Diagramme in einem.
-    x-Achse: Feature Modell
+    x-Achse: Feature-Modell
     y-achse: Millisekunden
     Slave-Fkt zu all_save_SAT"""
     datei_mod = os.path.join(ordnername, "sat-all"+ f"-{filterReader}.csv")
@@ -114,8 +120,8 @@ def all_save_SAT(df2,filterReader,ordnername):
         save_csv(df2,datei_mod)
 
         # Bild plotten
-        #plot_all_SAT(get_median(df,datei_mod),datei_mod.replace(".csv",".png"))
-        name = datei_mod.replace(".csv",".png")
+        #plot_all_SAT(get_median(df,datei_mod),datei_mod.replace(".csv",".svg"))
+        name = datei_mod.replace(".csv",".svg")
 
         df = get_median(df2,datei_mod)
 
@@ -149,13 +155,13 @@ def all_save_SAT(df2,filterReader,ordnername):
 
         
         plt.xlabel('Feature-Modell Jahr')
-        plt.ylabel('Millisekunden')
+        plt.ylabel(ylabelGLOD)
         # Achsenbeschriftungen festlegen
         if logScale:
             plt.yscale('log')
-            plt.ylabel('Millisekunden (log-scaled)')
+            plt.ylabel(f'{ylabelGLOD} (log_10)')
         plt.xticks(df[plot_x].unique(),rotation=90) 
-        plt.grid(True, which="both", ls="---")  # Gitterlinien anzeigen
+        plt.grid(True, which="both", ls=modusGRID)  # Gitterlinien anzeigen
         plt.title(f'SAT Solvern Vergleich ({filterReader})')  # Titel des Plots festlegen
         #plt.title("Geordnet nach Solver: " + name.split("/")[1])
 
@@ -167,7 +173,7 @@ def all_save_SAT(df2,filterReader,ordnername):
 
 def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
     """Diese Funktion plottet einzelne Diagramme.
-    x-Achse: Feature Modell Jahr
+    x-Achse: Feature-Modell Jahr
     y-achse: Millisekunden"""
     df2 = df2[df2['dimacs-file'].str.contains(filterReader) & (df2['dimacs-analyzer'] == filterVersion)]
     # sat-competition/07-RSat
@@ -176,7 +182,7 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
     if not df2.empty:
         save_csv(df2,datei_mod)
 
-        name = datei_mod.replace(".csv",".png")
+        name = datei_mod.replace(".csv",".svg")
         # Median berechnen und speichern
         df = get_median(df2,datei_mod)
 
@@ -212,13 +218,13 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
 
 
         plt.xlabel('Feature-Modell Jahr')
-        plt.ylabel('Millisekunden')
+        plt.ylabel(ylabelGLOD)
         if logScale:
             plt.yscale('log')
-            plt.ylabel('Millisekunden (log-scaled)')
+            plt.ylabel(f'{ylabelGLOD} (log_10)')
         plt.title("Solver: " + name.split("/")[1].split(".")[0])
         plt.xticks(df[plot_x].unique(),rotation=90) #
-        plt.grid(True)
+        plt.grid(True, which="both", ls=modusGRID) 
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Solver")
         plt.tight_layout()
 
@@ -237,7 +243,7 @@ def mod_SAT_all():
     ordnername = "sorted_by_SAT"
     create_folder_if_not_exists(ordnername)
 
-    # Die Feature Modell dynamisch laden
+    # Die Feature-Modell dynamisch laden
     data = load_data_from_csv("solve_model-satisfiable/output.csv")
 
     #  Füge den Solver das Jahr hinzu                                                                           #.astype('int64')
@@ -254,7 +260,7 @@ def mod_SAT_all():
     data['dimacs-analyzer-time_orig'] = data['dimacs-analyzer-time']
 
     # Zeit in Millisekunden
-    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.divide(x,1000000))
+    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.divide(x,secDiv)) 
 
     # Alle Salver auflisten
     df2 = data.groupby('dimacs-analyzer').apply(lambda x: x['dimacs-analyzer'].unique())
@@ -274,7 +280,7 @@ def mod_SAT_all():
     all_save_SAT(data,'kconfigreader',ordnername)
 
     # Durchlaufe jeden Solver
-    # Speichere zu jeden Feature Modell die entsprechenden Solver
+    # Speichere zu jeden Feature-Modell die entsprechenden Solver
     
     for entry in df2:
         sat_program = entry[0]
@@ -292,48 +298,53 @@ def plot_all_FM(df,name,ReaderStr):
     # Plot erstellen
     plt.figure(figsize=(12, 6))
 
-    # Farben für die Linien im Plot definieren
-    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    # 25 verschiedene Farben definieren
+    colors = [
+        'b', 'g', 'r', 'c', 'm', 'y', 'k', 'tab:blue', 'tab:orange', 'tab:green',
+        'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive',
+        'tab:cyan', 'aqua', 'lime', 'maroon', 'navy', 'olive', 'teal', 'fuchsia'
+    ]
 
     # Prefixe entfernen
     df['dimacs-file'] = df['dimacs-file'].str.replace('kconfigreader/linux/', '')
     df['dimacs-file'] = df['dimacs-file'].str.replace('kmax/linux/', '')
 
     # Suffix entfernen
-    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '',regex=False)
+    df['dimacs-file'] = df['dimacs-file'].str.replace('.dimacs', '', regex=False)
 
-    df['dimacs-analyzer'] = df['dimacs-analyzer'].str.replace('sat-competition/','')
+    df['dimacs-analyzer'] = df['dimacs-analyzer'].str.replace('sat-competition/', '')
 
     # Nur für FM
     df.sort_values(by='Year-SOLVER', inplace=True)
 
-    plot_x = 'Year-SOLVER' # 'dimacs-analyzer'  'Year-SOLVER'
+    plot_x = 'Year-SOLVER'  # 'dimacs-analyzer'  'Year-SOLVER'
     plot_y = 'dimacs-analyzer-time'
 
     i = 0
     tmp = ""
     # Durch jeden SAT-Solver iterieren und Daten plotten
-    for fmmodel, data in df.groupby('dimacs-file'):
-        plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', label=str(data['Year-DIMACS'].unique()[0]))# + "_" + fmmodel)
-        i +=1
+    for idx, (fmmodel, data) in enumerate(df.groupby('dimacs-file')):
+        color = colors[idx % len(colors)]
+        plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', color=color, label=str(data['Year-DIMACS'].unique()[0]))  # + "_" + fmmodel)
+        i += 1
         tmp = str(data['Year-DIMACS'].unique()[0])
 
     # Achsenbeschriftungen festlegen
     plt.xlabel('SAT-Solver')
-    plt.ylabel('Millisekunden')
-    plt.xticks(df[plot_x].unique(),rotation=90) 
+    plt.ylabel(ylabelGLOD)
+    plt.xticks(df[plot_x].unique(), rotation=90)
     if logScale:
         plt.yscale('log')
-        plt.ylabel('Millisekunden (log-scaled)')
+        plt.ylabel(f'{ylabelGLOD} (log_10)')
 
-    plt.grid(True, which="both", ls="---")  # Gitterlinien anzeigen
-    plt.title(f'Feature Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
+    plt.grid(True, which="both", ls=modusGRID)  # Gitterlinien anzeigen
+    plt.title(f'Feature-Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
     if i == 1:
-        plt.title(f"Feature Modell aus Jahr: {tmp}")
+        plt.title(f"Feature-Modell aus Jahr: {tmp}")
 
     # Plot anzeigen
     plt.tight_layout(rect=[0, 0, 0.7, 1])
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Feature Modell")  # Legende anpassen
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Feature-Modell")  # Legende anpassen
     plt.savefig(name)  # Plot speichern
     plt.close()
 
@@ -344,7 +355,7 @@ def all_save_FM(df,filterarg,ordnername):
     if not df.empty:
         # Speichere das Diagramm als csv Datei
         save_csv(df,df_datei)
-        plot_all_FM(get_median(df,df_datei),df_datei.replace(".csv",".png"),filterarg)
+        plot_all_FM(get_median(df,df_datei),df_datei.replace(".csv",".svg"),filterarg)
 
 def save_single_entry_FM(df,filterREADER,filterVersion,ordnername):
     """Hilfsfunktion um einen einzelnen Graph zu speichern als plot und csv"""
@@ -361,7 +372,7 @@ def save_single_entry_FM(df,filterREADER,filterVersion,ordnername):
         datei_mod = os.path.join(ordnername, str(tmp[0]) + f"-{filterREADER}.csv")
         
         save_csv(df_mod,datei_mod)
-        plot_all_FM(get_median(df_mod,datei_mod),datei_mod.replace(".csv",".png"),filterREADER)
+        plot_all_FM(get_median(df_mod,datei_mod),datei_mod.replace(".csv",".svg"),filterREADER)
 
 def mod_FM_all():
     print("Modus FM_all")
@@ -370,7 +381,7 @@ def mod_FM_all():
 
 
 
-    # Die Feature Modell dynamisch laden
+    # Die Feature-Modell dynamisch laden
     data = load_data_from_csv("solve_model-satisfiable/output.csv")
 
     #  Füge den Solver das Jahr hinzu
@@ -387,8 +398,8 @@ def mod_FM_all():
     # Speicher n der Millisekunden
     data['dimacs-analyzer-time_orig'] = data['dimacs-analyzer-time']
 
-    # Zeit in Millisekunden
-    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.divide(x,1000000))
+    # Zeit in sekunden
+    data['dimacs-analyzer-time'] = data['dimacs-analyzer-time'].apply(lambda x: np.divide(x,secDiv))
 
     # FM Modell zu 2024 entfernen
     if remove2024_dimacs:
@@ -408,8 +419,8 @@ def mod_FM_all():
     all_save_FM(data,'kconfigreader',ordnername)
 
     
-    # Durchlaufe jeden Feature Modell
-    # Speichere zu jeden Feature Modell die entsprechenden Solver
+    # Durchlaufe jeden Feature-Modell
+    # Speichere zu jeden Feature-Modell die entsprechenden Solver
     # Plotte die dabei erstellte csv Datei als Plot ab. 
     for entry in df2:
         feature_model_version = entry[0]
@@ -426,7 +437,7 @@ def mod_FM_all():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Auswahl von Optionen für die Batch-Konvertierung.")
-    parser.add_argument("options", type=int, nargs='+', choices=[1, 2], help="1 für geordnet nach Feature Modell, 2 für geordnet nach SAT-Solver")
+    parser.add_argument("options", type=int, nargs='+', choices=[1, 2], help="1 für geordnet nach Feature-Modell, 2 für geordnet nach SAT-Solver")
     parser.add_argument("-rm2024",nargs='?', type=int,help="Soll das FM des Jahr 2024 entfernt werden? True (1) or False (0)")
     parser.add_argument("-rm2023",nargs='?', type=int,help="Soll das SAT-Solver des Jahr 2023 entfernt werden? True (1) or False (0)")
     parser.add_argument("-logscale",nargs='?', type=int,help="Soll die Y-Achse der Diagramm log-scaled sein? True (1) or False (0)")
