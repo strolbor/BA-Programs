@@ -4,6 +4,7 @@ import os
 
 
 logScale = True
+secDiv = 1000000000 # Sekunden
 
 def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
@@ -63,15 +64,16 @@ def plotter(df, suffix):
         plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=solver, color=color_map[solver], zorder=2)
     
     plt.xlabel('Jahr')
-    plt.ylabel('Millisekunden')
+    plt.ylabel('Sekunden')
     if logScale:
             plt.yscale('log')
-            plt.ylabel('Millisekunden (log-scaled)')
+            plt.ylabel('Sekunden (log_10-scaled)')
     plt.title('Zeit vs. FM & Solver (Foresight)')
     plt.xticks(df['Year-DIMACS'].unique(), rotation=90)  # This ensures all unique years are marked on the x-axis
     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
     plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.svg'), bbox_inches='tight')
 
 if __name__ == '__main__':
     print("Foresight")

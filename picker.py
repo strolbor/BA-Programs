@@ -103,6 +103,45 @@ def save_csv(df,name):
     """speichert das DataFrame in eine csv Datei"""
     df.to_csv(name,index=False)
 
+
+def generate_gradient():
+    gradient = []
+
+    # Phase 1: Schwarz bis Grau (ohne Weiß)
+    for i in range(8):
+        gray_value = int(255 * (i / 9))
+        color = f'#{gray_value:02x}{gray_value:02x}{gray_value:02x}'
+        gradient.append(color)
+
+    # Phase 2: Hellblau zu Dunkelblau
+    for i in range(6):
+        blue_value = int(255 * ((7 - i) / 7))
+        color = f'#00{blue_value:02x}ff'
+        gradient.append(color)
+
+    # Phase 3: Dunkelblau zu Orange
+    for i in range(5):
+        blue_value = int(255 * (1 - (i / 5)))
+        red_value = int(255 * (i / 5))
+        color = f'#{red_value:02x}00{blue_value:02x}'
+        gradient.append(color)
+
+    # Phase 4: Orange zu Hellgrün
+    for i in range(5):
+        red_value = int(255 * (1 - (i / 5)))
+        green_value = int(255 * (i / 5))
+        color = f'#{red_value:02x}{green_value:02x}00'
+        gradient.append(color)
+
+    # Phase 5: Hellgrün zu Dunkelgrün
+    for i in range(5):
+        green_value = int(255 * (1 - (i / 5)))
+        color = f'#00{green_value:02x}00'
+        gradient.append(color)
+    #print(gradient)
+    return gradient
+
+
 # ----------------------
 MODUS_FM = 1
 MODUS_SAT = 2
@@ -122,6 +161,7 @@ def all_save_SAT(df2,filterReader,ordnername):
         # Bild plotten
         #plot_all_SAT(get_median(df,datei_mod),datei_mod.replace(".csv",".svg"))
         name = datei_mod.replace(".csv",".svg")
+        name2 = datei_mod.replace(".csv",".png")
 
         df = get_median(df2,datei_mod)
 
@@ -129,7 +169,7 @@ def all_save_SAT(df2,filterReader,ordnername):
         plt.figure(figsize=(12, 6))
 
         # Farben für die Linien im Plot definieren
-        colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+        colors = generate_gradient()
 
         # Prefixe entfernen
         df['dimacs-file'] = df['dimacs-file'].str.replace('kconfigreader/linux/', '')
@@ -169,6 +209,7 @@ def all_save_SAT(df2,filterReader,ordnername):
         plt.tight_layout(rect=[0, 0, 0.7, 1])
         plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Solver")  # Legende anpassen
         plt.savefig(name)  # Plot speichern
+        plt.savefig(name2)
         plt.close()
 
 def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
@@ -229,6 +270,7 @@ def save_single_entry_SAT(df2,filterReader, filterVersion, ordnername):
         plt.tight_layout()
 
         plt.savefig(os.path.join(name))
+        plt.savefig(os.path.join(name.replace(".svg",".png")))
         plt.close()
 
 def mod_SAT_all():
@@ -293,17 +335,15 @@ def mod_SAT_all():
 
 # FM
 
+
 def plot_all_FM(df,name,ReaderStr):
     """Speichert die Daten als Plot."""
     # Plot erstellen
     plt.figure(figsize=(12, 6))
 
-    # 25 verschiedene Farben definieren
-    colors = [
-        'b', 'g', 'r', 'c', 'm', 'y', 'k', 'tab:blue', 'tab:orange', 'tab:green',
-        'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive',
-        'tab:cyan', 'aqua', 'lime', 'maroon', 'navy', 'olive', 'teal', 'fuchsia'
-    ]
+    # 25 Graustufen definieren
+    #colors = [f'#{i:02x}{i:02x}{i:02x}' for i in range(0, 256, 10)]
+    colors = generate_gradient()
 
     # Prefixe entfernen
     df['dimacs-file'] = df['dimacs-file'].str.replace('kconfigreader/linux/', '')
@@ -323,9 +363,9 @@ def plot_all_FM(df,name,ReaderStr):
     i = 0
     tmp = ""
     # Durch jeden SAT-Solver iterieren und Daten plotten
-    for idx, (fmmodel, data) in enumerate(df.groupby('dimacs-file')):
+    for idx, (fmmodel, data) in enumerate(df.groupby('Year-DIMACS')):#'dimacs-file')):
         color = colors[idx % len(colors)]
-        plt.plot(data[plot_x], data[plot_y], marker='o', linestyle='-', color=color, label=str(data['Year-DIMACS'].unique()[0]))  # + "_" + fmmodel)
+        plt.plot(data[plot_x], data[plot_y], marker='o', linestyle=':', color=color, label=str(data['Year-DIMACS'].unique()[0]))  # + "_" + fmmodel)
         i += 1
         tmp = str(data['Year-DIMACS'].unique()[0])
 
@@ -346,6 +386,7 @@ def plot_all_FM(df,name,ReaderStr):
     plt.tight_layout(rect=[0, 0, 0.7, 1])
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Feature-Modell")  # Legende anpassen
     plt.savefig(name)  # Plot speichern
+    plt.savefig(name.replace(".svg",".png"))  # Plot speichern
     plt.close()
 
 def all_save_FM(df,filterarg,ordnername):
