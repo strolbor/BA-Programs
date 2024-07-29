@@ -26,10 +26,10 @@ def plotter_combined(df1, df2, suffix1, suffix2):
     global ordnername
     plt.figure(figsize=(12, 6))
 
-    plt.scatter(df1['Year-DIMACS'], df1['dimacs-analyzer-time'], label=f'Verlauf {suffix1}', color='blue')
+    plt.scatter(df1['Year-DIMACS'], df1['dimacs-analyzer-time'], label=f'Verlauf KMAX', color='blue')
     plt.plot(df1['Year-DIMACS'], df1['dimacs-analyzer-time'], marker='o', color='blue')
 
-    plt.scatter(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], label=f'Verlauf {suffix2}', color='red')
+    plt.scatter(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], label=f'Verlauf KConfigReader', color='red')
     plt.plot(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], marker='o', color='red')
 
     plt.xlabel('Jahr')

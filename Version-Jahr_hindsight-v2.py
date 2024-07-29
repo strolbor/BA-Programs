@@ -45,13 +45,14 @@ def combined_plotter(df1, df2, label1, label2):
     color_map1 = {solver: colors1(i) for i, solver in enumerate(solvers1)}
     color_map2 = {solver: colors2(i) for i, solver in enumerate(solvers2)}
 
-    plt.plot(df1['Year-DIMACS'], df1['dimacs-analyzer-time'], color='black', linewidth=0.5, linestyle='-', zorder=1, label=f'{label1} line')
-    plt.plot(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], color='gray', linewidth=0.5, linestyle='-', zorder=1, label=f'{label2} line')
+    plt.plot(df1['Year-DIMACS'], df1['dimacs-analyzer-time'], color='blue', linewidth=0.5, linestyle='-', zorder=1, label=f'{label1} line')
+    
 
     for solver in solvers1:
         solver_df = df1[df1['dimacs-analyzer'] == solver]
         plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=f'{label1} - {solver.split("/")[1]}', color=color_map1[solver], zorder=2)
 
+    plt.plot(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], color='red', linewidth=0.5, linestyle='-', zorder=1, label=f'{label2} line')
     for solver in solvers2:
         solver_df = df2[df2['dimacs-analyzer'] == solver]
         plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=f'{label2} - {solver.split("/")[1]}', color=color_map2[solver], zorder=2)
