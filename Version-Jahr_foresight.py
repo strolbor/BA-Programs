@@ -72,8 +72,8 @@ def plotter(df, suffix):
     plt.xticks(df['Year-DIMACS'].unique(), rotation=90)  # This ensures all unique years are marked on the x-axis
     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
-    plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.png'), bbox_inches='tight')
-    plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix}.svg'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, f'Version-Jahr-foresight-{suffix}.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, f'Version-Jahr-foresight-{suffix}.svg'), bbox_inches='tight')
 
 if __name__ == '__main__':
     print("Foresight")

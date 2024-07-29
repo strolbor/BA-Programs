@@ -63,7 +63,7 @@ def plotter(df1, df2, label1, label2):
     # Zeichne die Punkte in verschiedenen Farben für df1
     for solver in solvers1:
         solver_df = df1[df1['dimacs-analyzer'] == solver]
-        plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=f'{label1} - {solver}', color=color_map[solver], zorder=2)
+        plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=f'{label1} - {solver.split("/")[1]}', color=color_map[solver], zorder=2)
     
     # Zeichne die durchgehende Linie für df2
     plt.plot(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], color='grey', linewidth=0.5, linestyle='-', zorder=1, label=f'{label2} - Line')
@@ -71,7 +71,7 @@ def plotter(df1, df2, label1, label2):
     # Zeichne die Punkte in verschiedenen Farben für df2
     for solver in solvers2:
         solver_df = df2[df2['dimacs-analyzer'] == solver]
-        plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=f'{label2} - {solver}', color=color_map[solver], zorder=2)
+        plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=f'{label2} - {solver.split("/")[1]}', color=color_map[solver], zorder=2)
     
     plt.xlabel('Jahr')
     plt.ylabel('Sekunden')
@@ -82,8 +82,8 @@ def plotter(df1, df2, label1, label2):
     plt.xticks(sorted(set(df1['Year-DIMACS']).union(set(df2['Year-DIMACS']))), rotation=90)  # Ensures all unique years are marked on the x-axis
     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
-    plt.savefig(os.path.join(ordnername, 'Version-Jahr-kconfig-kmax.png'), bbox_inches='tight')
-    plt.savefig(os.path.join(ordnername, 'Version-Jahr-kconfig-kmax.svg'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, 'Version-Jahr-foresight-combined.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, 'Version-Jahr-foresight-combined.svg'), bbox_inches='tight')
 
 if __name__ == '__main__':
     print("Foresight")

@@ -41,8 +41,8 @@ def plotter_combined(df1, df2, suffix1, suffix2):
     plt.xticks(df1['Year-DIMACS'].unique(), rotation=90)  # Assuming both dataframes have the same years
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
-    plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix1}-{suffix2}-combined.png'), bbox_inches='tight')
-    plt.savefig(os.path.join(ordnername, f'Version-Jahr-{suffix1}-{suffix2}-combined.svg'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, f'Version-Jahr-punktpunkt-{suffix1}-{suffix2}-combined.png'), bbox_inches='tight')
+    plt.savefig(os.path.join(ordnername, f'Version-Jahr-punktpunkt-{suffix1}-{suffix2}-combined.svg'), bbox_inches='tight')
 
 if __name__ == '__main__':
     print("punkt-punkt")
