@@ -39,9 +39,9 @@ Führe:
 
 python3 tenPlotterSAT.py && \ 
 python3 tenPlotterFM.py && \
-python3 Version-Jahr_punktpunkt.py &&\
-python3 Version-Jahr_handsight.py && \
-python3 Version-Jahr_foresight.py 
+python3 Version-Jahr_punktpunkt-v2.py &&\
+python3 Version-Jahr_hindsight-v2.py && \
+python3 Version-Jahr_foresight-v2.py 
 
 ```
 

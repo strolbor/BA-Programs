@@ -37,7 +37,8 @@ def plotter_combined(df1, df2, suffix1, suffix2):
     if logScale:
         plt.yscale('log')
         plt.ylabel('Sekunden (log_10-scaled)')
-    plt.title('Zeit vs. FM & Solver aus dem gleichen Jahr')
+    #plt.title('Zeit vs. FM & Solver aus dem gleichen Jahr')
+    plt.title("")
     plt.xticks(df1['Year-DIMACS'].unique(), rotation=90)  # Assuming both dataframes have the same years
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)

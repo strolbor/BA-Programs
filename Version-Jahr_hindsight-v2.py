@@ -62,7 +62,8 @@ def combined_plotter(df1, df2, label1, label2):
     if logScale:
         plt.yscale('log')
         plt.ylabel('Sekunden (log_10-scaled)')
-    plt.title('Zeit vs. FM & Solver aus dem besten Nachjahr')
+    #plt.title('Zeit vs. FM & Solver aus dem besten Nachjahr')
+    plt.title("")
     plt.xticks(list(set(df1['Year-DIMACS'].unique()).union(set(df2['Year-DIMACS'].unique()))), rotation=90)
     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)

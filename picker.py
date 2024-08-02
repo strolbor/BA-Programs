@@ -202,8 +202,9 @@ def all_save_SAT(df2,filterReader,ordnername):
             plt.ylabel(f'{ylabelGLOD} (log_10)')
         plt.xticks(df[plot_x].unique(),rotation=90) 
         plt.grid(True, which="both", ls=modusGRID)  # Gitterlinien anzeigen
-        plt.title(f'SAT Solvern Vergleich ({filterReader})')  # Titel des Plots festlegen
+        #plt.title(f'SAT Solvern Vergleich ({filterReader})')  # Titel des Plots festlegen
         #plt.title("Geordnet nach Solver: " + name.split("/")[1])
+        plt.title("")
 
         # Plot anzeigen
         plt.tight_layout(rect=[0, 0, 0.7, 1])
@@ -378,7 +379,8 @@ def plot_all_FM(df,name,ReaderStr):
         plt.ylabel(f'{ylabelGLOD} (log_10)')
 
     plt.grid(True, which="both", ls=modusGRID)  # Gitterlinien anzeigen
-    plt.title(f'Feature-Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
+    # plt.title(f'Feature-Modell Vergleich ({ReaderStr})')  # Titel des Plots festlegen
+    plt.title("")
     if i == 1:
         plt.title(f"Feature-Modell aus Jahr: {tmp}")
 

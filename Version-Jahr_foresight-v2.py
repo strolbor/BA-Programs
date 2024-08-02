@@ -58,7 +58,7 @@ def plotter(df1, df2, label1, label2):
     color_map = {solver: colors(i) for i, solver in enumerate(list(solvers1) + list(solvers2))}
     
     # Zeichne die durchgehende Linie für df1
-    plt.plot(df1['Year-DIMACS'], df1['dimacs-analyzer-time'], color='black', linewidth=0.5, linestyle='-', zorder=1, label=f'{label1} - Line')
+    plt.plot(df1['Year-DIMACS'], df1['dimacs-analyzer-time'], color='blue', linewidth=0.5, linestyle='-', zorder=1, label=f'{label1} - Line')
     
     # Zeichne die Punkte in verschiedenen Farben für df1
     for solver in solvers1:
@@ -66,7 +66,7 @@ def plotter(df1, df2, label1, label2):
         plt.scatter(solver_df['Year-DIMACS'], solver_df['dimacs-analyzer-time'], label=f'{label1} - {solver.split("/")[1]}', color=color_map[solver], zorder=2)
     
     # Zeichne die durchgehende Linie für df2
-    plt.plot(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], color='grey', linewidth=0.5, linestyle='-', zorder=1, label=f'{label2} - Line')
+    plt.plot(df2['Year-DIMACS'], df2['dimacs-analyzer-time'], color='red', linewidth=0.5, linestyle='-', zorder=1, label=f'{label2} - Line')
     
     # Zeichne die Punkte in verschiedenen Farben für df2
     for solver in solvers2:
@@ -78,7 +78,8 @@ def plotter(df1, df2, label1, label2):
     if logScale:
         plt.yscale('log')
         plt.ylabel('Sekunden (log_10-scaled)')
-    plt.title('Zeit vs. FM & Solver (Foresight)')
+    #plt.title('Zeit vs. FM & Solver (Foresight)')
+    plt.title("")
     plt.xticks(sorted(set(df1['Year-DIMACS']).union(set(df2['Year-DIMACS']))), rotation=90)  # Ensures all unique years are marked on the x-axis
     plt.legend(title='Solver', loc='center left', bbox_to_anchor=(1, 0.5))
     plt.grid(True)
