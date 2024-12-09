@@ -1,6 +1,6 @@
-# Ignore all files except those listed below
-*
+# # Ignore all files except those listed below
+# *
 
-# Whitelist specific files or directories
-!*py
-!README.md
+# # Whitelist specific files or directories
+# !*py
+# !README.md
